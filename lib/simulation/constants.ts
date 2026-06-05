@@ -11,10 +11,10 @@ export const rulesetModifiers: Record<
   }
 > = {
   modern: {
-    label: "Modern",
+    label: "Modern Physicality",
     spacingMultiplier: 1.08,
     threePointMultiplier: 1.1,
-    physicalityMultiplier: 0.95,
+    physicalityMultiplier: 1.06,
     paceMultiplier: 1.03,
   },
   physical_90s: {

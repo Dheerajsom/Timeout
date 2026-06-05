@@ -4,9 +4,10 @@ import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronRight, Dices, Loader2 } from "lucide-react";
-import type { Ruleset, Team } from "@/types/simulation";
+import { getTeamColors } from "@/lib/teamColors";
+import type { Team } from "@/types/simulation";
 
-const rulesets: Ruleset[] = ["neutral", "modern", "physical_90s", "early_2000s", "bubble"];
+const activeRuleset = "modern";
 const spinDuration = 5000;
 const itemPitch = 94;
 const targetOffset = 62;
@@ -71,7 +72,6 @@ export function HomeGame({ teams }: { teams: Team[] }) {
 
     setIsSimulating(true);
     setError("");
-    const ruleset = rulesets[Math.floor(Math.random() * rulesets.length)];
     const response = await fetch("/api/simulate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -79,7 +79,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
         teamAId: selected.id,
         teamBId: enemy.id,
         mode: "single_game",
-        ruleset,
+        ruleset: activeRuleset,
       }),
     });
     const payload = await response.json();
@@ -94,7 +94,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden px-4 pb-8 pt-8 sm:px-6 sm:pt-10 lg:px-8">
+    <main className="relative min-h-screen overflow-hidden px-4 pb-8 pt-2 sm:px-6 sm:pt-4 lg:px-8">
       <div className="absolute inset-0 halftone opacity-10" aria-hidden="true" />
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-black/52 via-black/18 to-transparent"
@@ -120,7 +120,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
       </section>
 
       <section className="relative mx-auto mt-7 grid max-w-7xl items-start gap-5 lg:grid-cols-[1fr_400px]">
-        <div className="rounded-md border border-orange-200/18 bg-slate-950/78 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.38)] backdrop-blur-md">
+        <div className="rounded-md border border-white/20 bg-slate-950/82 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.38)] backdrop-blur-md">
           <div className="mb-5 text-center">
             <h2 className="text-3xl font-black text-white">Pick your squad</h2>
           </div>
@@ -174,7 +174,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
           </div>
         </div>
 
-        <aside className="rounded-md border border-orange-200/18 bg-slate-950/78 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-md">
+        <aside className="rounded-md border border-white/20 bg-slate-950/82 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-md">
           {enemy ? <OpponentHeader team={enemy} /> : null}
           {enemy ? <TeamCard team={enemy} opponent /> : <EmptyPanel label="New Round sets the matchup." />}
           {error ? <p className="mt-3 text-sm text-orange-300">{error}</p> : null}
@@ -277,7 +277,7 @@ function TeamMark({ team }: { team: Team }) {
   const initials = getTeamInitials(team.franchise);
 
   return (
-    <div className="grid h-12 w-12 place-items-center rounded-full border border-white/35 bg-white/18 text-sm font-black tracking-normal text-white shadow-[0_12px_28px_rgba(0,0,0,0.24)]">
+    <div className="grid h-12 w-12 place-items-center rounded-full border border-white/30 bg-white/20 text-sm font-black tracking-normal text-white shadow-[0_12px_28px_rgba(0,0,0,0.24)]">
       {initials}
     </div>
   );
@@ -319,7 +319,7 @@ function drawTeams(pool: Team[], count: number) {
 
 function buildPreviewWheel(teams: Team[]): WheelState {
   return {
-    teams: Array.from({ length: 18 }, () => teams[Math.floor(Math.random() * teams.length)]),
+    teams: Array.from({ length: 18 }, (_item, index) => teams[index % teams.length]),
     targetIndex: 2,
   };
 }
@@ -344,35 +344,4 @@ function buildWheelForTarget(pool: Team[], target: Team, wheelIndex: number): Wh
     teams: wheel,
     targetIndex,
   };
-}
-
-function getTeamColors(team: Team) {
-  const colorsById: Record<string, { primary: string; secondary: string; accent: string }> = {
-    "1967-76ers": { primary: "#ed174c", secondary: "#006bb6", accent: "#ffffff" },
-    "1972-lakers": { primary: "#552583", secondary: "#fdb927", accent: "#ffffff" },
-    "1983-76ers": { primary: "#ed174c", secondary: "#006bb6", accent: "#ffffff" },
-    "1986-celtics": { primary: "#007a33", secondary: "#ba9653", accent: "#ffffff" },
-    "1993-suns": { primary: "#1d1160", secondary: "#e56020", accent: "#f9ad1b" },
-    "1995-magic": { primary: "#0077c0", secondary: "#c4ced4", accent: "#000000" },
-    "1996-bulls": { primary: "#ce1141", secondary: "#111111", accent: "#ffffff" },
-    "1996-sonics": { primary: "#00653a", secondary: "#ffc200", accent: "#ffffff" },
-    "2001-lakers": { primary: "#552583", secondary: "#fdb927", accent: "#ffffff" },
-    "2002-kings": { primary: "#5a2d81", secondary: "#63727a", accent: "#ffffff" },
-    "2004-pistons": { primary: "#c8102e", secondary: "#1d42ba", accent: "#bec0c2" },
-    "2005-suns": { primary: "#1d1160", secondary: "#e56020", accent: "#f9ad1b" },
-    "2008-celtics": { primary: "#007a33", secondary: "#ba9653", accent: "#ffffff" },
-    "2011-bulls": { primary: "#ce1141", secondary: "#111111", accent: "#ffffff" },
-    "2013-heat": { primary: "#98002e", secondary: "#f9a01b", accent: "#111111" },
-    "2014-spurs": { primary: "#c4ced4", secondary: "#111111", accent: "#8a8d8f" },
-    "2016-cavaliers": { primary: "#6f263d", secondary: "#ffb81c", accent: "#041e42" },
-    "2016-thunder": { primary: "#007ac1", secondary: "#ef3b24", accent: "#fdbb30" },
-    "2017-warriors": { primary: "#1d428a", secondary: "#ffc72c", accent: "#ffffff" },
-    "2018-rockets": { primary: "#ce1141", secondary: "#111111", accent: "#c4ced4" },
-    "2019-raptors": { primary: "#ce1141", secondary: "#111111", accent: "#a1a1a4" },
-    "2020-lakers": { primary: "#552583", secondary: "#fdb927", accent: "#ffffff" },
-    "2021-nets": { primary: "#111111", secondary: "#f5f5f5", accent: "#777777" },
-    "2024-celtics": { primary: "#007a33", secondary: "#ba9653", accent: "#ffffff" },
-  };
-
-  return colorsById[team.id] ?? { primary: "#f97316", secondary: "#4f46e5", accent: "#ffffff" };
 }

@@ -3,8 +3,8 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dices, Loader2, RotateCcw } from "lucide-react";
-import type { Ruleset, SimulationMode, Team } from "@/types/simulation";
-import { modeOptions, rulesetOptions } from "@/lib/simulation/constants";
+import type { SimulationMode, Team } from "@/types/simulation";
+import { modeOptions } from "@/lib/simulation/constants";
 import { TeamSelect } from "./TeamSelect";
 
 export function SimulationForm({
@@ -20,7 +20,6 @@ export function SimulationForm({
   const [teamAId, setTeamAId] = useState(initialTeamAId ?? teams[0]?.id ?? "");
   const [teamBId, setTeamBId] = useState(initialTeamBId ?? teams[1]?.id ?? "");
   const [mode, setMode] = useState<SimulationMode>("single_game");
-  const [ruleset, setRuleset] = useState<Ruleset>("neutral");
   const [seed, setSeed] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +48,7 @@ export function SimulationForm({
         teamAId,
         teamBId,
         mode,
-        ruleset,
+        ruleset: "modern",
         seed: seed.trim() || undefined,
       }),
     });
@@ -71,7 +70,7 @@ export function SimulationForm({
         <TeamSelect label="Team B" teams={teams} value={teamBId} onChange={setTeamBId} />
       </div>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-[1fr_1fr_1.2fr]">
+      <div className="mt-5 grid gap-4 md:grid-cols-[1fr_1.2fr]">
         <label className="block">
           <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-muted">
             Mode
@@ -82,22 +81,6 @@ export function SimulationForm({
             className="h-11 w-full rounded-md border border-white/10 bg-ink px-3 text-sm outline-none focus:border-teal"
           >
             {modeOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-muted">
-            Ruleset
-          </span>
-          <select
-            value={ruleset}
-            onChange={(event) => setRuleset(event.target.value as Ruleset)}
-            className="h-11 w-full rounded-md border border-white/10 bg-ink px-3 text-sm outline-none focus:border-teal"
-          >
-            {rulesetOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>

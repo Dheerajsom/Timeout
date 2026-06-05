@@ -25,8 +25,8 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <div className="min-h-screen">
           <header className="relative z-50">
-            <div className="mx-auto flex max-w-7xl items-center justify-center px-4 py-5 sm:px-6 lg:px-8">
-              <Link href="/" className="group flex flex-col items-center gap-2">
+            <div className="mx-auto flex max-w-7xl items-center justify-center px-4 pb-2 pt-4 sm:px-6 sm:pt-5 lg:px-8">
+              <Link href="/" className="group flex flex-col items-center gap-0">
                 <span className="relative block h-28 w-28 transition duration-200 group-hover:scale-105 sm:h-32 sm:w-32">
                   <Image
                     src="/timeout-logo-mark.png"
@@ -37,7 +37,7 @@ export default function RootLayout({
                     className="object-contain"
                   />
                 </span>
-                <span className="text-center">
+                <span className="-mt-2 text-center">
                   <span className="block text-2xl font-black uppercase tracking-normal text-white drop-shadow-[2px_2px_0_rgba(255,107,0,0.9)] sm:text-3xl">
                     Timeout
                   </span>

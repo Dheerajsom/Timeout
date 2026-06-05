@@ -1,6 +1,6 @@
 # Timeout
 
-Timeout is a Next.js NBA era matchup simulator. Pick historical teams, choose a ruleset, and run deterministic single-game or best-of-seven simulations with box scores, matchup factors, and result pages.
+Timeout is a Next.js NBA era matchup simulator. Pick historical teams and run deterministic single-game or best-of-seven simulations with modern NBA physicality, box scores, matchup factors, and result pages.
 
 ## Tech Stack
 
@@ -33,4 +33,3 @@ npm run build
 ## Deployment
 
 The project is configured for Vercel and currently uses stateless result URLs, so it can run on the free tier without a database.
-

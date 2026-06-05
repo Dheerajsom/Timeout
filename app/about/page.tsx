@@ -5,7 +5,7 @@ export default function AboutPage() {
       <div className="mt-6 space-y-5 text-sm leading-7 text-muted">
         <p>
           Timeout is a historical NBA matchup simulator. The first version uses hand-tuned
-          team and player ratings, era ruleset modifiers, and seeded randomness to produce
+          team and player ratings, modern NBA physicality, and seeded randomness to produce
           believable games and series.
         </p>
         <p>
