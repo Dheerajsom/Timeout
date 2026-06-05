@@ -27,14 +27,14 @@ export default function RootLayout({
           <header className="fixed inset-x-0 top-0 z-50">
             <div className="mx-auto flex max-w-7xl items-center justify-center px-4 py-4 sm:px-6 lg:px-8">
               <Link href="/" className="group flex flex-col items-center gap-2">
-                <span className="relative block h-16 w-16 overflow-hidden rounded-full border-2 border-orange-400 bg-black shadow-[0_0_28px_rgba(255,107,0,0.34)] transition group-hover:scale-105">
+                <span className="relative block h-16 w-16 transition group-hover:scale-105">
                   <Image
                     src="/timeout-logo-mark.png"
                     alt="Timeout"
                     fill
                     priority
                     sizes="64px"
-                    className="object-cover"
+                    className="object-contain"
                   />
                 </span>
                 <span className="text-center">
