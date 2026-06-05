@@ -94,9 +94,12 @@ export function HomeGame({ teams }: { teams: Team[] }) {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden px-4 pb-8 pt-36 sm:px-6 lg:px-8">
-      <div className="absolute inset-0 halftone opacity-25" aria-hidden="true" />
-      <div className="absolute left-1/2 top-28 h-72 w-[46rem] -translate-x-1/2 rounded-full bg-orange-500/10 blur-3xl" aria-hidden="true" />
+    <main className="relative min-h-screen overflow-hidden px-4 pb-8 pt-56 sm:px-6 sm:pt-64 lg:px-8">
+      <div className="absolute inset-0 halftone opacity-10" aria-hidden="true" />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-black/52 via-black/18 to-transparent"
+        aria-hidden="true"
+      />
 
       <section className="relative mx-auto max-w-5xl text-center">
         <h1 className="text-3xl font-black tracking-normal text-white sm:text-4xl">
@@ -117,7 +120,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
       </section>
 
       <section className="relative mx-auto mt-7 grid max-w-7xl items-start gap-5 lg:grid-cols-[1fr_400px]">
-        <div className="rounded-md border border-slate-700 bg-slate-900 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.25)]">
+        <div className="rounded-md border border-orange-200/18 bg-slate-950/78 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.38)] backdrop-blur-md">
           <div className="mb-5 text-center">
             <h2 className="text-3xl font-black text-white">Pick your squad</h2>
           </div>
@@ -171,7 +174,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
           </div>
         </div>
 
-        <aside className="rounded-md border border-slate-700 bg-slate-900 p-5">
+        <aside className="rounded-md border border-orange-200/18 bg-slate-950/78 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-md">
           {enemy ? <OpponentHeader team={enemy} /> : null}
           {enemy ? <TeamCard team={enemy} opponent /> : <EmptyPanel label="New Round sets the matchup." />}
           {error ? <p className="mt-3 text-sm text-orange-300">{error}</p> : null}

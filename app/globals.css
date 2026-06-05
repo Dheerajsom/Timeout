@@ -4,7 +4,7 @@
 
 :root {
   color-scheme: dark;
-  background: #0d1020;
+  background: #160c08;
 }
 
 * {
@@ -14,12 +14,41 @@
 body {
   margin: 0;
   min-height: 100vh;
+  position: relative;
   background:
-    linear-gradient(180deg, rgba(15, 19, 36, 0.92), rgba(13, 16, 32, 0.98)),
-    radial-gradient(circle at 20% 8%, rgba(255, 107, 0, 0.17), transparent 22rem),
-    radial-gradient(circle at 83% 17%, rgba(79, 70, 229, 0.16), transparent 24rem),
-    #0d1020;
+    linear-gradient(180deg, rgba(12, 8, 7, 0.78), rgba(9, 11, 20, 0.88) 42%, rgba(8, 10, 18, 0.96)),
+    repeating-linear-gradient(90deg, rgba(255, 222, 171, 0.08) 0 2px, transparent 2px 86px),
+    repeating-linear-gradient(0deg, rgba(91, 45, 18, 0.26) 0 1px, transparent 1px 22px),
+    linear-gradient(90deg, #8a451f 0%, #d19148 16%, #a95e27 31%, #e4a75b 48%, #a65a24 64%, #d7974f 82%, #7c3d1d 100%);
+  background-attachment: fixed;
   color: #fff8ee;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent calc(50% - 1px), rgba(255, 242, 215, 0.58) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
+    radial-gradient(circle at 50% 50%, transparent 0 8.3rem, rgba(255, 242, 215, 0.52) 8.35rem 8.5rem, transparent 8.55rem),
+    radial-gradient(circle at 50% -2%, transparent 0 13.2rem, rgba(255, 242, 215, 0.34) 13.25rem 13.42rem, transparent 13.5rem),
+    radial-gradient(circle at 50% 102%, transparent 0 13.2rem, rgba(255, 242, 215, 0.34) 13.25rem 13.42rem, transparent 13.5rem),
+    linear-gradient(90deg, transparent 0 8%, rgba(255, 242, 215, 0.42) 8% calc(8% + 2px), transparent calc(8% + 2px) 92%, rgba(255, 242, 215, 0.42) 92% calc(92% + 2px), transparent calc(92% + 2px)),
+    linear-gradient(0deg, transparent 0 13%, rgba(255, 242, 215, 0.34) 13% calc(13% + 2px), transparent calc(13% + 2px) 87%, rgba(255, 242, 215, 0.34) 87% calc(87% + 2px), transparent calc(87% + 2px));
+  opacity: 0.82;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 8%, rgba(255, 126, 34, 0.18), transparent 30rem),
+    linear-gradient(180deg, rgba(4, 6, 12, 0.32), rgba(4, 6, 12, 0.62) 58%, rgba(4, 6, 12, 0.84));
 }
 
 a {
