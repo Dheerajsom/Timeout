@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Team {
+  id           String   @id @default(cuid())
+  name         String
+  franchise    String
+  season       String
+  wins         Int
+  losses       Int
+  pace         Int
+  offense      Int
+  defense      Int
+  spacing      Int
+  rimPressure  Int
+  rebounding   Int
+  playmaking   Int
+  starPower    Int
+  benchDepth   Int
+  clutch       Int
+  physicality  Int
+  styleSummary String
+  players      Player[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Player {
+  id            String @id @default(cuid())
+  teamId        String
+  team          Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  name          String
+  position      String
+  minutes       Int
+  usage         Int
+  scoring       Int
+  efficiency    Int
+  threePoint    Int
+  playmaking    Int
+  rebounding    Int
+  defense       Int
+  rimProtection Int
+  physicality   Int
+  clutch        Int
+}
+
+model Simulation {
+  id         String   @id @default(cuid())
+  teamAId    String
+  teamBId    String
+  mode       String
+  ruleset    String
+  seed       String
+  resultJson Json
+  createdAt  DateTime @default(now())
+}
