@@ -94,7 +94,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden px-4 pb-8 pt-56 sm:px-6 sm:pt-64 lg:px-8">
+    <main className="relative min-h-screen overflow-hidden px-4 pb-8 pt-8 sm:px-6 sm:pt-10 lg:px-8">
       <div className="absolute inset-0 halftone opacity-10" aria-hidden="true" />
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-black/52 via-black/18 to-transparent"

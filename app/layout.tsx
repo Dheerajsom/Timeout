@@ -24,7 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="font-sans antialiased">
         <div className="min-h-screen">
-          <header className="fixed inset-x-0 top-0 z-50">
+          <header className="relative z-50">
             <div className="mx-auto flex max-w-7xl items-center justify-center px-4 py-5 sm:px-6 lg:px-8">
               <Link href="/" className="group flex flex-col items-center gap-2">
                 <span className="relative block h-28 w-28 transition duration-200 group-hover:scale-105 sm:h-32 sm:w-32">
