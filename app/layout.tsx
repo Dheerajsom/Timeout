@@ -24,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
+        <CourtBackground />
         <div className="min-h-screen">
           <header className="relative z-50">
             <div className="mx-auto flex max-w-7xl items-center justify-center px-4 pb-2 pt-4 sm:px-6 sm:pt-5 lg:px-8">
@@ -66,5 +67,79 @@ export default function RootLayout({
         </div>
       </body>
     </html>
+  );
+}
+
+function CourtBackground() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 940 500"
+      preserveAspectRatio="xMidYMid meet"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        zIndex: -1,
+        pointerEvents: "none",
+      }}
+    >
+      <defs>
+        <linearGradient id="courtFloor" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stopColor="#f3c27a" />
+          <stop offset="0.28" stopColor="#d89448" />
+          <stop offset="0.5" stopColor="#efbd73" />
+          <stop offset="0.74" stopColor="#bd7434" />
+          <stop offset="1" stopColor="#e8ad62" />
+        </linearGradient>
+        <pattern id="courtPlanks" width="94" height="500" patternUnits="userSpaceOnUse">
+          <rect width="94" height="500" fill="transparent" />
+          <path d="M0 0V500M94 0V500" stroke="#6f3a18" strokeOpacity="0.22" strokeWidth="1.5" />
+          <path d="M0 86H94M0 207H94M0 333H94M0 448H94" stroke="#fff0c2" strokeOpacity="0.12" />
+        </pattern>
+        <linearGradient id="courtShade" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#05070c" stopOpacity="0.1" />
+          <stop offset="0.55" stopColor="#05070c" stopOpacity="0.18" />
+          <stop offset="1" stopColor="#05070c" stopOpacity="0.5" />
+        </linearGradient>
+      </defs>
+
+      <rect width="940" height="500" fill="url(#courtFloor)" />
+      <rect width="940" height="500" fill="url(#courtPlanks)" />
+      <rect x="0" y="170" width="190" height="160" fill="#8f3f20" opacity="0.24" />
+      <rect x="750" y="170" width="190" height="160" fill="#8f3f20" opacity="0.24" />
+
+      <g fill="none" stroke="#fff9eb" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4">
+        <rect x="5" y="5" width="930" height="490" />
+        <line x1="470" x2="470" y1="5" y2="495" />
+        <circle cx="470" cy="250" r="60" />
+
+        <rect x="0" y="170" width="190" height="160" />
+        <rect x="750" y="170" width="190" height="160" />
+
+        <path d="M190 190A60 60 0 0 1 190 310" />
+        <path d="M190 190A60 60 0 0 0 190 310" strokeDasharray="10 10" />
+        <path d="M750 190A60 60 0 0 0 750 310" />
+        <path d="M750 190A60 60 0 0 1 750 310" strokeDasharray="10 10" />
+
+        <path d="M52.5 210A40 40 0 0 1 52.5 290" />
+        <path d="M887.5 210A40 40 0 0 0 887.5 290" />
+
+        <path d="M5 30H142" />
+        <path d="M5 470H142" />
+        <path d="M142 30A237.5 237.5 0 0 1 142 470" />
+        <path d="M935 30H798" />
+        <path d="M935 470H798" />
+        <path d="M798 30A237.5 237.5 0 0 0 798 470" />
+      </g>
+
+      <g fill="#fff9eb">
+        <circle cx="52.5" cy="250" r="6" />
+        <circle cx="887.5" cy="250" r="6" />
+      </g>
+      <rect width="940" height="500" fill="url(#courtShade)" />
+    </svg>
   );
 }

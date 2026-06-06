@@ -4,7 +4,7 @@
 
 :root {
   color-scheme: dark;
-  background: #160c08;
+  background: #07080a;
 }
 
 * {
@@ -15,41 +15,8 @@ body {
   margin: 0;
   min-height: 100vh;
   position: relative;
-  background:
-    linear-gradient(180deg, rgba(12, 8, 4, 0.32), rgba(9, 11, 16, 0.42) 42%, rgba(5, 7, 12, 0.68)),
-    repeating-linear-gradient(90deg, rgba(255, 236, 184, 0.16) 0 2px, transparent 2px 88px),
-    repeating-linear-gradient(0deg, rgba(81, 39, 12, 0.2) 0 1px, transparent 1px 24px),
-    linear-gradient(90deg, #9b5425 0%, #d49a52 12%, #b86f33 25%, #e5ad63 39%, #bf7939 51%, #efbd76 64%, #b7672e 78%, #d79a55 90%, #8f4a22 100%);
-  background-attachment: fixed;
+  background: #07080a;
   color: #fff8ee;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, transparent calc(50% - 1px), rgba(255, 248, 228, 0.82) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
-    radial-gradient(circle at 50% 50%, transparent 0 8.1rem, rgba(255, 248, 228, 0.76) 8.18rem 8.34rem, transparent 8.42rem),
-    radial-gradient(circle at 50% -3%, transparent 0 13rem, rgba(255, 248, 228, 0.5) 13.08rem 13.26rem, transparent 13.34rem),
-    radial-gradient(circle at 50% 103%, transparent 0 13rem, rgba(255, 248, 228, 0.5) 13.08rem 13.26rem, transparent 13.34rem),
-    linear-gradient(90deg, transparent 0 7%, rgba(82, 32, 18, 0.52) 7% 17%, transparent 17% 83%, rgba(82, 32, 18, 0.52) 83% 93%, transparent 93%),
-    linear-gradient(90deg, transparent 0 7%, rgba(255, 248, 228, 0.62) 7% calc(7% + 2px), transparent calc(7% + 2px) 17%, rgba(255, 248, 228, 0.62) 17% calc(17% + 2px), transparent calc(17% + 2px) 83%, rgba(255, 248, 228, 0.62) 83% calc(83% + 2px), transparent calc(83% + 2px) 93%, rgba(255, 248, 228, 0.62) 93% calc(93% + 2px), transparent calc(93% + 2px)),
-    linear-gradient(0deg, transparent 0 12%, rgba(255, 248, 228, 0.5) 12% calc(12% + 2px), transparent calc(12% + 2px) 88%, rgba(255, 248, 228, 0.5) 88% calc(88% + 2px), transparent calc(88% + 2px));
-  opacity: 0.9;
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse at 50% 5%, rgba(255, 255, 255, 0.14), transparent 26rem),
-    linear-gradient(180deg, rgba(4, 6, 12, 0.2), rgba(4, 6, 12, 0.5) 58%, rgba(4, 6, 12, 0.78));
 }
 
 a {

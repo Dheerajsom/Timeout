@@ -139,7 +139,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
             disabled={isSpinning || isSimulating}
             className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-orange-500 px-8 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(255,107,0,0.28)] transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <Dices className="h-4 w-4" aria-hidden="true" />
+            <BasketballIcon className="h-4 w-4" />
             New Round
           </button>
           <button
@@ -153,8 +153,8 @@ export function HomeGame({ teams }: { teams: Team[] }) {
         </div>
       </section>
 
-      <section className="relative mx-auto mt-7 grid max-w-7xl items-start gap-5 lg:grid-cols-[1fr_400px]">
-        <div className="rounded-md border border-white/20 bg-slate-950/82 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.38)] backdrop-blur-md">
+      <section className="relative mx-auto mt-7 grid max-w-7xl items-stretch gap-5 lg:grid-cols-2">
+        <div className="h-full rounded-md border border-white/20 bg-slate-950/82 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.38)] backdrop-blur-md">
           <div className="mb-5 text-center">
             <h2 className="text-3xl font-black text-white">Pick your squad</h2>
           </div>
@@ -208,7 +208,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
           </div>
         </div>
 
-        <aside className="rounded-md border border-white/20 bg-slate-950/82 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-md">
+        <aside className="h-full rounded-md border border-white/20 bg-slate-950/82 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-md">
           {enemy ? <OpponentHeader team={enemy} /> : null}
           {enemy ? <TeamCard team={enemy} opponent /> : <EmptyPanel label="New Round sets the matchup." />}
           {error ? <p className="mt-3 text-sm text-orange-300">{error}</p> : null}
@@ -220,6 +220,27 @@ export function HomeGame({ teams }: { teams: Team[] }) {
         onClose={() => setIsHistoryOpen(false)}
       />
     </main>
+  );
+}
+
+function BasketballIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M4.8 7.2c4.4 1.8 8.1 5.5 10 10" />
+      <path d="M19.2 16.8c-4.4-1.8-8.1-5.5-10-10" />
+      <path d="M12 3c1.9 2.5 2.8 5.5 2.8 9s-.9 6.5-2.8 9" />
+      <path d="M3 12h18" />
+    </svg>
   );
 }
 
