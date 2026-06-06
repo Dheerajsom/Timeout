@@ -129,7 +129,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
         <h1 className="text-3xl font-black tracking-normal text-white sm:text-4xl">
           Matchups time never gave us.
         </h1>
-        <p className="mx-auto mt-3 max-w-xl text-base leading-7 text-slate-300">
+        <p className="mx-auto mt-3 max-w-xl text-base font-semibold leading-7 text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.55)]">
           A challenger appears. Spin three mystery squads and pick the one built to win.
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
@@ -145,7 +145,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
           <button
             type="button"
             onClick={() => setIsHistoryOpen(true)}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-white/20 bg-slate-950/78 px-5 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(0,0,0,0.22)] transition hover:border-orange-300 hover:bg-slate-900"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-white/20 bg-neutral-950 px-5 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(0,0,0,0.22)] transition hover:border-orange-300 hover:bg-neutral-900"
           >
             <History className="h-4 w-4" aria-hidden="true" />
             History
@@ -153,8 +153,8 @@ export function HomeGame({ teams }: { teams: Team[] }) {
         </div>
       </section>
 
-      <section className="relative mx-auto mt-7 grid max-w-7xl items-stretch gap-5 lg:grid-cols-2">
-        <div className="h-full rounded-md border border-white/20 bg-slate-950/82 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.38)] backdrop-blur-md">
+      <section className="relative mx-auto mt-7 grid max-w-7xl items-stretch gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
+        <div className="h-full rounded-md border border-white/18 bg-neutral-950 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
           <div className="mb-5 text-center">
             <h2 className="text-3xl font-black text-white">Pick your squad</h2>
           </div>
@@ -208,7 +208,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
           </div>
         </div>
 
-        <aside className="h-full rounded-md border border-white/20 bg-slate-950/82 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-md">
+        <aside className="h-full rounded-md border border-white/18 bg-neutral-950 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
           {enemy ? <OpponentHeader team={enemy} /> : null}
           {enemy ? <TeamCard team={enemy} opponent /> : <EmptyPanel label="New Round sets the matchup." />}
           {error ? <p className="mt-3 text-sm text-orange-300">{error}</p> : null}
@@ -246,7 +246,15 @@ function BasketballIcon({ className }: { className?: string }) {
       <circle cx="32" cy="32" r="28" fill="url(#newRoundBall)" stroke="#7c2d12" strokeWidth="3" />
       <circle cx="32" cy="32" r="28" fill="url(#newRoundBallShine)" />
       <path
-        d="M12 18c16 5 28 17 34 34M52 46C36 41 24 29 18 12M32 4c6 8 9 17 9 28s-3 20-9 28M4 32h56"
+        d="M4 32h56M32 4c-9 8-14 18-14 28s5 20 14 28M32 4c9 8 14 18 14 28s-5 20-14 28"
+        fill="none"
+        stroke="#5b2109"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="4"
+      />
+      <path
+        d="M9 18c16 0 27 6 32 17 4 8 9 11 15 11M8 46c16 0 27-6 33-17 4-8 9-11 15-11"
         fill="none"
         stroke="#5b2109"
         strokeLinecap="round"
@@ -283,7 +291,7 @@ function HistoryDialog({
       role="dialog"
       aria-modal="true"
       aria-labelledby="history-title"
-      className="fixed inset-0 z-[80] flex items-end justify-center bg-black/64 px-4 py-5 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-[80] flex items-end justify-center bg-black/72 px-4 py-5 sm:items-center"
     >
       <div className="w-full max-w-2xl rounded-md border border-white/15 bg-neutral-950 text-left shadow-[0_28px_90px_rgba(0,0,0,0.5)]">
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
@@ -291,7 +299,7 @@ function HistoryDialog({
             <h2 id="history-title" className="text-lg font-black uppercase tracking-normal text-white">
               History
             </h2>
-            <p className="mt-1 text-sm text-white/55">Your past rounds on this browser.</p>
+            <p className="mt-1 text-sm text-neutral-300">Your past rounds on this browser.</p>
           </div>
           <button
             type="button"
@@ -311,7 +319,7 @@ function HistoryDialog({
                   key={round.id}
                   href={round.resultUrl}
                   onClick={onClose}
-                  className="grid gap-3 rounded-md border border-white/10 bg-white/[0.045] p-4 transition hover:border-orange-300 hover:bg-white/[0.075] sm:grid-cols-[auto_1fr_auto] sm:items-center"
+                  className="grid gap-3 rounded-md border border-white/10 bg-neutral-900 p-4 transition hover:border-orange-300 hover:bg-neutral-800 sm:grid-cols-[auto_1fr_auto] sm:items-center"
                 >
                   <span
                     className={`inline-flex h-8 items-center justify-center rounded-md px-3 text-xs font-black uppercase ${
@@ -324,7 +332,7 @@ function HistoryDialog({
                     <span className="block text-sm font-black text-white">
                       {round.userTeam} vs {round.opponentTeam}
                     </span>
-                    <span className="mt-1 block text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
+                    <span className="mt-1 block text-xs font-semibold uppercase tracking-[0.12em] text-neutral-300">
                       {formatHistoryDate(round.playedAt)}
                     </span>
                   </span>
@@ -335,10 +343,10 @@ function HistoryDialog({
               ))}
             </div>
           ) : (
-            <div className="grid min-h-[180px] place-items-center rounded-md border border-dashed border-white/15 bg-white/[0.035] p-6 text-center">
+            <div className="grid min-h-[180px] place-items-center rounded-md border border-dashed border-white/15 bg-neutral-900 p-6 text-center">
               <div>
                 <div className="text-base font-black text-white">No rounds yet</div>
-                <p className="mt-2 text-sm leading-6 text-white/55">Spin, pick a squad, and simulate to start building your History.</p>
+                <p className="mt-2 text-sm leading-6 text-neutral-300">Spin, pick a squad, and simulate to start building your History.</p>
               </div>
             </div>
           )}
@@ -378,7 +386,7 @@ function TeamCard({
       <div className="flex min-h-[170px] flex-col justify-between">
         <TeamMark team={team} />
         <div>
-          <div className="text-xs font-black uppercase tracking-[0.16em] text-white/72">{team.season}</div>
+          <div className="text-xs font-black uppercase tracking-[0.16em] text-white/85">{team.season}</div>
           <div className="mt-2 text-2xl font-black leading-7 text-white">{team.franchise}</div>
         </div>
       </div>
@@ -388,7 +396,7 @@ function TeamCard({
 
 function ReelColumn({ wheel, index }: { wheel: WheelState; index: number }) {
   return (
-    <div className="relative h-[230px] overflow-hidden rounded-md border border-slate-700 bg-slate-950/80">
+    <div className="relative h-[230px] overflow-hidden rounded-md border border-slate-700 bg-neutral-950">
       <div className="wheel-arrow" aria-hidden="true">
         <span />
       </div>
@@ -421,7 +429,7 @@ function WheelTeam({ team }: { team: Team }) {
       }}
     >
       <div>
-        <div className="text-[11px] font-black uppercase tracking-[0.16em] text-white/70">{team.season}</div>
+        <div className="text-[11px] font-black uppercase tracking-[0.16em] text-white/85">{team.season}</div>
         <div className="mt-1 text-base font-black leading-5 text-white">{team.franchise}</div>
       </div>
     </div>
@@ -431,7 +439,7 @@ function WheelTeam({ team }: { team: Team }) {
 function OpponentHeader({ team }: { team: Team }) {
   return (
     <div className="mb-5 text-center">
-      <div className="text-xs font-black uppercase tracking-[0.18em] text-white/60">Can you beat the...</div>
+      <div className="text-xs font-black uppercase tracking-[0.18em] text-neutral-300">Can you beat the...</div>
       <h2 className="mt-2 text-3xl font-black leading-8 text-white">{team.franchise}</h2>
     </div>
   );
@@ -451,10 +459,10 @@ function IdleSlot({ index }: { index: number }) {
   return (
     <div className="slot-idle grid h-[230px] place-items-center rounded-md border border-slate-700 bg-slate-950 p-5 text-center">
       <div>
-        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full border border-white/15 bg-white/8 text-2xl font-black text-white/70">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full border border-white/15 bg-white/8 text-2xl font-black text-white/85">
           {index + 1}
         </div>
-        <div className="mt-4 text-sm font-black uppercase tracking-[0.16em] text-white/55">Spin to reveal</div>
+        <div className="mt-4 text-sm font-black uppercase tracking-[0.16em] text-neutral-300">Spin to reveal</div>
       </div>
     </div>
   );
@@ -462,7 +470,7 @@ function IdleSlot({ index }: { index: number }) {
 
 function EmptyPanel({ label }: { label: string }) {
   return (
-    <div className="grid min-h-[260px] place-items-center rounded-md border border-dashed border-slate-700 bg-slate-950/45 p-6 text-center text-sm text-slate-400">
+    <div className="grid min-h-[260px] place-items-center rounded-md border border-dashed border-slate-700 bg-neutral-900 p-6 text-center text-sm text-neutral-300">
       {label}
     </div>
   );

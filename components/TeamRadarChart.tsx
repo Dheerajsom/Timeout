@@ -26,11 +26,11 @@ export function TeamRadarChart({ teamA, teamB }: { teamA: Team; teamB: Team }) {
   }));
 
   return (
-    <div className="overflow-x-auto rounded-md border border-white/10 bg-white/[0.03] p-4">
+    <div className="overflow-x-auto rounded-md border border-white/12 bg-neutral-950 p-4">
       <div className="mx-auto w-[640px] max-w-full">
         <RadarChart width={640} height={320} data={data}>
           <PolarGrid stroke="rgba(255,255,255,0.14)" />
-          <PolarAngleAxis dataKey="metric" tick={{ fill: "#8f98a8", fontSize: 12 }} />
+          <PolarAngleAxis dataKey="metric" tick={{ fill: "#d1d5db", fontSize: 12, fontWeight: 700 }} />
           <Tooltip
             contentStyle={{ background: "#101318", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 6 }}
             labelStyle={{ color: "#f6f7fb" }}

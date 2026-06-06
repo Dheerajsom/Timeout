@@ -3,7 +3,7 @@ import type { PlayerBoxScore } from "@/types/simulation";
 
 export function MvpCard({ mvp }: { mvp: PlayerBoxScore }) {
   return (
-    <div className="rounded-md border border-white/10 bg-neutral-950/90 p-4 shadow-[0_18px_48px_rgba(0,0,0,0.22)]">
+    <div className="rounded-md border border-white/12 bg-neutral-950 p-4 shadow-[0_18px_48px_rgba(0,0,0,0.28)]">
       <div className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.16em] text-white">
         <Award className="h-4 w-4" aria-hidden="true" />
         MVP
@@ -20,9 +20,9 @@ export function MvpCard({ mvp }: { mvp: PlayerBoxScore }) {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded border border-white/10 bg-white/[0.04] px-2 py-3">
+    <div className="rounded border border-white/12 bg-neutral-900 px-2 py-3">
       <div className="text-xl font-black text-white">{value}</div>
-      <div className="mt-1 text-xs font-semibold text-neutral-400">{label}</div>
+      <div className="mt-1 text-xs font-bold text-neutral-300">{label}</div>
     </div>
   );
 }

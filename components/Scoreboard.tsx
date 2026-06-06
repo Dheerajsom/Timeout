@@ -8,26 +8,26 @@ export function Scoreboard({ result }: { result: SimulatedGame | SimulatedSeries
   const winnerId = result.winnerTeamId;
 
   return (
-    <section className="border-b border-white/10 bg-neutral-950/88">
+    <section className="border-b border-white/10 bg-neutral-950">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-5 flex flex-wrap items-center gap-3 text-neutral-200">
+        <div className="mb-5 flex flex-wrap items-center gap-3 text-neutral-100">
           <RulesetBadge ruleset={result.ruleset} />
-          <span className="rounded border border-white/10 bg-white/[0.03] px-2 py-1 text-xs text-neutral-300">
+          <span className="rounded border border-white/15 bg-neutral-900 px-2 py-1 text-xs font-semibold text-neutral-100">
             Seed {result.seed}
           </span>
-          <span className="rounded border border-white/10 bg-white/[0.03] px-2 py-1 text-xs text-neutral-300">
+          <span className="rounded border border-white/15 bg-neutral-900 px-2 py-1 text-xs font-semibold text-neutral-100">
             {result.type === "best_of_7" ? "Best-of-7" : "Single game"}
           </span>
         </div>
         <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr] md:items-stretch">
           <ScoreTeam team={result.teamA} score={game.teamAScore} isWinner={winnerId === result.teamA.id} align="left" />
-          <div className="hidden place-items-center rounded border border-white/10 bg-white/[0.04] px-5 text-sm font-black uppercase tracking-[0.28em] text-neutral-300 md:grid">
+          <div className="hidden place-items-center rounded border border-white/15 bg-neutral-900 px-5 text-sm font-black uppercase tracking-[0.28em] text-neutral-100 md:grid">
             Final
           </div>
           <ScoreTeam team={result.teamB} score={game.teamBScore} isWinner={winnerId === result.teamB.id} align="right" />
         </div>
         {result.type === "best_of_7" ? (
-          <p className="mt-4 text-sm text-muted">
+          <p className="mt-4 text-sm font-semibold text-neutral-200">
             {result.teamA.name} {result.teamAWins}, {result.teamB.name} {result.teamBWins}
           </p>
         ) : null}
@@ -72,7 +72,7 @@ function ScoreTeam({
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.14),transparent_34%),linear-gradient(90deg,rgba(0,0,0,0.26),transparent_54%)]" aria-hidden="true" />
       <div className="relative flex items-start justify-between gap-4 md:block">
         <div>
-          <div className="text-sm font-black uppercase tracking-[0.18em] text-white/74">{team.season}</div>
+          <div className="text-sm font-black uppercase tracking-[0.18em] text-white/90">{team.season}</div>
           <div className={`mt-1 text-2xl ${isWinner ? "font-black" : "font-semibold"} text-white sm:text-3xl`}>
             {team.franchise}
           </div>

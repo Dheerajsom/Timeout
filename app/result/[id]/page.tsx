@@ -47,9 +47,9 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
           <div className="space-y-5">
           {result.type === "best_of_7" ? <SeriesSummary series={result} /> : null}
           <QuarterTable game={game} />
-          <div className="rounded-md border border-white/10 bg-panel p-5">
+          <div className="rounded-md border border-white/12 bg-neutral-950 p-5">
             <h2 className="text-lg font-semibold text-white">Why It Played Out This Way</h2>
-            <p className="mt-3 text-sm leading-7 text-muted">{result.explanation}</p>
+            <p className="mt-3 text-sm leading-7 text-neutral-300">{result.explanation}</p>
           </div>
           <TeamRadarChart teamA={result.teamA} teamB={result.teamB} />
           </div>

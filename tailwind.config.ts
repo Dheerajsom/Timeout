@@ -12,7 +12,7 @@ const config: Config = {
         ink: "#07080a",
         panel: "#101318",
         line: "#242a33",
-        muted: "#8f98a8",
+        muted: "#cbd5e1",
         hardwood: "#c78d50",
         signal: "#ff4f5a",
         teal: "#26d0b8",

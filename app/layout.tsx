@@ -43,7 +43,7 @@ export default function RootLayout({
                   <span className="block text-2xl font-black uppercase tracking-normal text-white drop-shadow-[2px_2px_0_rgba(255,107,0,0.9)] sm:text-3xl">
                     Timeout
                   </span>
-                  <span className="block text-[11px] font-bold uppercase tracking-[0.22em] text-orange-400">
+                  <span className="block text-[11px] font-black uppercase tracking-[0.22em] text-orange-100 drop-shadow-[0_2px_0_rgba(124,45,18,0.95)]">
                     Est. 2026
                   </span>
                 </span>
@@ -53,7 +53,7 @@ export default function RootLayout({
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Open Timeout on GitHub"
-                className="absolute right-4 top-4 inline-flex h-11 items-center justify-center gap-2 rounded-md border border-white/20 bg-slate-950/80 px-3 text-xs font-black uppercase tracking-normal text-white shadow-[0_14px_36px_rgba(0,0,0,0.28)] transition hover:border-orange-300 hover:bg-orange-500 sm:right-6 sm:px-4 lg:right-8"
+                className="absolute right-4 top-4 inline-flex h-11 items-center justify-center gap-2 rounded-md border border-white/20 bg-neutral-950 px-3 text-xs font-black uppercase tracking-normal text-white shadow-[0_14px_36px_rgba(0,0,0,0.28)] transition hover:border-orange-300 hover:bg-orange-500 sm:right-6 sm:px-4 lg:right-8"
               >
                 <Code2 className="h-4 w-4" aria-hidden="true" />
                 <span className="hidden sm:inline">GitHub</span>
@@ -61,7 +61,7 @@ export default function RootLayout({
             </div>
           </header>
           {children}
-          <footer className="relative z-40 px-4 pb-6 text-center text-xs font-semibold uppercase tracking-[0.14em] text-white/55 sm:px-6 lg:px-8">
+          <footer className="relative z-40 px-4 pb-6 text-center text-xs font-bold uppercase tracking-[0.14em] text-white/85 drop-shadow-[0_2px_0_rgba(0,0,0,0.65)] sm:px-6 lg:px-8">
             Timeout is an independent project and not affiliated with the NBA.
           </footer>
         </div>
@@ -110,21 +110,21 @@ function CourtBackground() {
 
       <rect width="940" height="500" fill="url(#courtFloor)" />
       <rect width="940" height="500" fill="url(#courtPlanks)" />
-      <rect x="0" y="170" width="190" height="160" fill="#8f3f20" opacity="0.24" />
-      <rect x="750" y="170" width="190" height="160" fill="#8f3f20" opacity="0.24" />
+      <rect x="5" y="170" width="190" height="160" fill="#8f3f20" opacity="0.24" />
+      <rect x="745" y="170" width="190" height="160" fill="#8f3f20" opacity="0.24" />
 
       <g fill="none" stroke="#fff9eb" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4">
         <rect x="5" y="5" width="930" height="490" />
         <line x1="470" x2="470" y1="5" y2="495" />
         <circle cx="470" cy="250" r="60" />
 
-        <rect x="0" y="170" width="190" height="160" />
-        <rect x="750" y="170" width="190" height="160" />
+        <path d="M5 170H195V330H5" />
+        <path d="M935 170H745V330H935" />
 
-        <path d="M190 190A60 60 0 0 1 190 310" />
-        <path d="M190 190A60 60 0 0 0 190 310" strokeDasharray="10 10" />
-        <path d="M750 190A60 60 0 0 0 750 310" />
-        <path d="M750 190A60 60 0 0 1 750 310" strokeDasharray="10 10" />
+        <path d="M195 190A60 60 0 0 1 195 310" />
+        <path d="M195 190A60 60 0 0 0 195 310" strokeDasharray="10 10" />
+        <path d="M745 190A60 60 0 0 0 745 310" />
+        <path d="M745 190A60 60 0 0 1 745 310" strokeDasharray="10 10" />
 
         <path d="M52.5 210A40 40 0 0 1 52.5 290" />
         <path d="M887.5 210A40 40 0 0 0 887.5 290" />
