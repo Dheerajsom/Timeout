@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 import { Code2 } from "lucide-react";
 import "./globals.css";
 
@@ -65,6 +66,7 @@ export default function RootLayout({
             Timeout is an independent project and not affiliated with the NBA.
           </footer>
         </div>
+        <Analytics />
       </body>
     </html>
   );
