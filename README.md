@@ -1,35 +1,21 @@
 # Timeout
 
-Timeout is a Next.js NBA era matchup simulator. Pick historical teams and run deterministic single-game or best-of-seven simulations with modern NBA physicality, box scores, matchup factors, and result pages.
+Timeout is an NBA matchup simulator built around teams from different seasons. Start a new round, spin three mystery squads, choose the team you trust, and see if they can beat the opponent.
 
-## Tech Stack
+## How The Game Works
 
-- Next.js App Router
-- React
-- TypeScript
-- Tailwind CSS
-- Prisma schema for future database-backed persistence
+1. Start a new round to generate an opponent.
+2. Spin the three team slots to reveal your possible squads.
+3. Pick one team from the revealed options.
+4. Simulate the matchup under modern NBA physicality and toughness.
+5. Review the result page to see the winner, MVP, box score, quarter scoring, matchup factors, and team comparison.
 
-## Getting Started
+Each matchup is meant to feel fast, random, and replayable. The team pool includes modern season entries across every franchise, so rounds can throw familiar contenders, overlooked teams, and weird cross-era style clashes at you.
 
-Install dependencies:
+## Results And History
 
-```bash
-npm install
-```
+Simulation results include team-colored scorecards, a highlighted winner, MVP details, and full box-score widgets. The History button keeps track of past rounds from your current browser session and shows whether your pick won or lost.
 
-Run the development server:
+## Disclaimer
 
-```bash
-npm run dev
-```
-
-Build for production:
-
-```bash
-npm run build
-```
-
-## Deployment
-
-The project is configured for Vercel and currently uses stateless result URLs, so it can run on the free tier without a database.
+Timeout is an independent project and is not affiliated with the NBA.
