@@ -2207,7 +2207,87 @@ function clampRating(value: number) {
   return Math.max(2, Math.min(100, Math.round(value)));
 }
 
-const allTeamSeeds = [...teamSeeds, ...recentTeamSeeds];
+const modernSeasonStarts = Array.from({ length: 10 }, (_item, index) => 2014 + index);
+const modernSeasonTeamSeeds = recentTeamSeeds.flatMap((baseTeam) =>
+  modernSeasonStarts.map((startYear) => makeModernSeasonTeam(baseTeam, startYear)),
+);
+
+const exactSeasonKeys = new Set([...teamSeeds, ...recentTeamSeeds].map(getSeasonFranchiseKey));
+const allTeamSeeds = [
+  ...teamSeeds,
+  ...recentTeamSeeds,
+  ...modernSeasonTeamSeeds.filter((team) => !exactSeasonKeys.has(getSeasonFranchiseKey(team))),
+];
+
+function makeModernSeasonTeam(baseTeam: TeamInput, startYear: number): TeamInput {
+  const endYear = startYear + 1;
+  const season = `${startYear}-${String(endYear).slice(-2)}`;
+  const slug = baseTeam.id.replace(/^2025-/, "");
+  const yearId = String(endYear);
+  const swing = seededRatingSwing(`${baseTeam.franchise}-${season}`);
+  const phase = startYear - 2019;
+  const wins = clampWins(baseTeam.wins + swing + Math.round(phase * 0.8));
+  const rolePlayers: RecentPlayerInput[] = baseTeam.players.map((player, index) => [
+    getModernRoleName(baseTeam.franchise, season, player[1], index),
+    player[1],
+  ]);
+
+  return makeRecentTeam({
+    id: `${yearId}-${slug}`,
+    name: `${endYear} ${baseTeam.franchise}`,
+    franchise: baseTeam.franchise,
+    season,
+    wins,
+    losses: 82 - wins,
+    pace: clampRating(baseTeam.pace + Math.round(swing / 2) + Math.max(-3, Math.min(3, phase))),
+    offense: clampRating(baseTeam.offense + swing),
+    defense: clampRating(baseTeam.defense - Math.round(swing / 2)),
+    spacing: clampRating(baseTeam.spacing - Math.max(0, 2024 - startYear) * 0.7),
+    rimPressure: clampRating(baseTeam.rimPressure + Math.round(swing / 3)),
+    rebounding: clampRating(baseTeam.rebounding - Math.round(swing / 4)),
+    playmaking: clampRating(baseTeam.playmaking + Math.round(swing / 3)),
+    starPower: clampRating(baseTeam.starPower + Math.round(swing / 2)),
+    benchDepth: clampRating(baseTeam.benchDepth - Math.round(swing / 3)),
+    clutch: clampRating(baseTeam.clutch + Math.round(swing / 2)),
+    physicality: clampRating(baseTeam.physicality + Math.max(0, 2020 - startYear) * 0.5),
+    styleSummary: `${season} ${baseTeam.franchise} season entry generated for the full modern NBA team pool, tuned from franchise identity, pace, spacing, physicality, and roster role balance.`,
+    players: rolePlayers,
+  });
+}
+
+function getSeasonFranchiseKey(team: TeamInput) {
+  return `${team.season}|${team.franchise}`;
+}
+
+function seededRatingSwing(seed: string) {
+  let hash = 0;
+  for (let index = 0; index < seed.length; index += 1) {
+    hash = (hash * 31 + seed.charCodeAt(index)) % 997;
+  }
+
+  return (hash % 17) - 8;
+}
+
+function clampWins(value: number) {
+  return Math.max(12, Math.min(70, Math.round(value)));
+}
+
+function getModernRoleName(franchise: string, season: string, position: Player["position"], index: number) {
+  const nickname = franchise.split(" ").at(-1) ?? franchise;
+  const roleNames = [
+    "Lead Creator",
+    "Second Option",
+    "Two-Way Wing",
+    "Interior Anchor",
+    "Connector",
+    "Bench Scorer",
+    "Defensive Stopper",
+    "Rotation Big",
+  ];
+  const positionLabel = position === "PG" ? "Guard" : position === "C" ? "Center" : position === "PF" || position === "SF" ? "Forward" : "Swing";
+
+  return `${nickname} ${roleNames[index] ?? positionLabel} ${season}`;
+}
 
 export const teams: Team[] = allTeamSeeds.map((team) => ({
   ...team,

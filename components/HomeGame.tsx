@@ -119,9 +119,9 @@ export function HomeGame({ teams }: { teams: Team[] }) {
 
   return (
     <main className="relative min-h-screen overflow-hidden px-4 pb-8 pt-2 sm:px-6 sm:pt-4 lg:px-8">
-      <div className="absolute inset-0 halftone opacity-10" aria-hidden="true" />
+      <div className="absolute inset-0 halftone opacity-[0.045]" aria-hidden="true" />
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-black/52 via-black/18 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-black/26 via-black/8 to-transparent"
         aria-hidden="true"
       />
 
@@ -139,7 +139,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
             disabled={isSpinning || isSimulating}
             className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-orange-500 px-8 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(255,107,0,0.28)] transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <BasketballIcon className="h-4 w-4" />
+            <BasketballIcon className="h-5 w-5" />
             New Round
           </button>
           <button
@@ -226,20 +226,41 @@ export function HomeGame({ teams }: { teams: Team[] }) {
 function BasketballIcon({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 24 24"
+      viewBox="0 0 64 64"
       className={className}
       aria-hidden="true"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
     >
-      <circle cx="12" cy="12" r="9" />
-      <path d="M4.8 7.2c4.4 1.8 8.1 5.5 10 10" />
-      <path d="M19.2 16.8c-4.4-1.8-8.1-5.5-10-10" />
-      <path d="M12 3c1.9 2.5 2.8 5.5 2.8 9s-.9 6.5-2.8 9" />
-      <path d="M3 12h18" />
+      <defs>
+        <radialGradient id="newRoundBall" cx="31%" cy="24%" r="76%">
+          <stop offset="0" stopColor="#fff4b8" />
+          <stop offset="0.2" stopColor="#ffb02e" />
+          <stop offset="0.58" stopColor="#f97316" />
+          <stop offset="1" stopColor="#9a3412" />
+        </radialGradient>
+        <linearGradient id="newRoundBallShine" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.45" />
+          <stop offset="0.42" stopColor="#ffffff" stopOpacity="0.05" />
+          <stop offset="1" stopColor="#111827" stopOpacity="0.22" />
+        </linearGradient>
+      </defs>
+      <circle cx="32" cy="32" r="28" fill="url(#newRoundBall)" stroke="#7c2d12" strokeWidth="3" />
+      <circle cx="32" cy="32" r="28" fill="url(#newRoundBallShine)" />
+      <path
+        d="M12 18c16 5 28 17 34 34M52 46C36 41 24 29 18 12M32 4c6 8 9 17 9 28s-3 20-9 28M4 32h56"
+        fill="none"
+        stroke="#5b2109"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="4"
+      />
+      <path
+        d="M16 15c7-6 19-8 29 0"
+        fill="none"
+        stroke="#fff7d6"
+        strokeLinecap="round"
+        strokeWidth="3"
+        opacity="0.52"
+      />
     </svg>
   );
 }
@@ -346,7 +367,7 @@ function TeamCard({
   return (
     <div
       style={style}
-      className={`team-card h-full rounded-md border p-4 ${
+      className={`team-card ${opponent ? "min-h-[220px]" : "h-full"} rounded-md border p-4 ${
         selected
           ? "border-orange-300 shadow-[0_0_0_2px_rgba(251,146,60,0.38),0_18px_40px_rgba(0,0,0,0.28)]"
           : opponent

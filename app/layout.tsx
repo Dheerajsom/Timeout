@@ -84,6 +84,8 @@ function CourtBackground() {
         height: "100vh",
         zIndex: -1,
         pointerEvents: "none",
+        background:
+          "linear-gradient(90deg, #b96a2e 0%, #f1bd73 18%, #d89144 34%, #f4c57c 50%, #c77a36 66%, #efb66b 82%, #a85a27 100%)",
       }}
     >
       <defs>
@@ -100,9 +102,9 @@ function CourtBackground() {
           <path d="M0 86H94M0 207H94M0 333H94M0 448H94" stroke="#fff0c2" strokeOpacity="0.12" />
         </pattern>
         <linearGradient id="courtShade" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="#05070c" stopOpacity="0.1" />
-          <stop offset="0.55" stopColor="#05070c" stopOpacity="0.18" />
-          <stop offset="1" stopColor="#05070c" stopOpacity="0.5" />
+          <stop offset="0" stopColor="#fff2c7" stopOpacity="0.16" />
+          <stop offset="0.46" stopColor="#05070c" stopOpacity="0.02" />
+          <stop offset="1" stopColor="#05070c" stopOpacity="0.18" />
         </linearGradient>
       </defs>
 
