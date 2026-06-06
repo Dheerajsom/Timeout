@@ -226,48 +226,29 @@ export function HomeGame({ teams }: { teams: Team[] }) {
 function BasketballIcon({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 64 64"
+      viewBox="0 0 100 100"
       className={className}
       aria-hidden="true"
     >
-      <defs>
-        <radialGradient id="newRoundBall" cx="31%" cy="24%" r="76%">
-          <stop offset="0" stopColor="#fff4b8" />
-          <stop offset="0.2" stopColor="#ffb02e" />
-          <stop offset="0.58" stopColor="#f97316" />
-          <stop offset="1" stopColor="#9a3412" />
-        </radialGradient>
-        <linearGradient id="newRoundBallShine" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stopColor="#ffffff" stopOpacity="0.45" />
-          <stop offset="0.42" stopColor="#ffffff" stopOpacity="0.05" />
-          <stop offset="1" stopColor="#111827" stopOpacity="0.22" />
-        </linearGradient>
-      </defs>
-      <circle cx="32" cy="32" r="28" fill="url(#newRoundBall)" stroke="#7c2d12" strokeWidth="3" />
-      <circle cx="32" cy="32" r="28" fill="url(#newRoundBallShine)" />
+      <clipPath id="newRoundBallClip">
+        <circle cx="50" cy="50" r="43" />
+      </clipPath>
+      <circle cx="50" cy="50" r="43" fill="white" />
+      <g clipPath="url(#newRoundBallClip)">
+        <path d="M10 10L90 90M90 10L10 90" stroke="#0f172a" strokeWidth="8" />
+        <path
+          d="M4 51c20 2 36-3 48-15 10-10 15-24 13-39M49 100c-2-20 3-36 15-48 10-10 24-15 39-13"
+          fill="none"
+          stroke="#0f172a"
+          strokeLinecap="round"
+          strokeWidth="8"
+        />
+      </g>
       <path
-        d="M4 32h56M32 4c-9 8-14 18-14 28s5 20 14 28M32 4c9 8 14 18 14 28s-5 20-14 28"
+        d="M50 7a43 43 0 1 1 0 86 43 43 0 0 1 0-86Z"
         fill="none"
-        stroke="#5b2109"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="4"
-      />
-      <path
-        d="M9 18c16 0 27 6 32 17 4 8 9 11 15 11M8 46c16 0 27-6 33-17 4-8 9-11 15-11"
-        fill="none"
-        stroke="#5b2109"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="4"
-      />
-      <path
-        d="M16 15c7-6 19-8 29 0"
-        fill="none"
-        stroke="#fff7d6"
-        strokeLinecap="round"
-        strokeWidth="3"
-        opacity="0.52"
+        stroke="white"
+        strokeWidth="2"
       />
     </svg>
   );
