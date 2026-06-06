@@ -31,6 +31,45 @@ input {
   font: inherit;
 }
 
+.brand-title {
+  color: #f97316;
+  text-shadow:
+    0 2px 0 #111827,
+    0 4px 14px rgba(17, 24, 39, 0.45);
+}
+
+.hero-title {
+  color: #fffaf0;
+  text-shadow:
+    2px 0 0 #111827,
+    -2px 0 0 #111827,
+    0 2px 0 #111827,
+    0 -2px 0 #111827,
+    2px 2px 0 #111827,
+    -2px 2px 0 #111827,
+    2px -2px 0 #111827,
+    -2px -2px 0 #111827,
+    0 6px 18px rgba(17, 24, 39, 0.42);
+}
+
+.panel-title {
+  position: relative;
+  display: inline-block;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.56);
+}
+
+.panel-title::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -0.18em;
+  height: 0.12em;
+  border-radius: 999px;
+  background: #f97316;
+  opacity: 0.92;
+}
+
 .court-visual {
   position: relative;
   overflow: hidden;

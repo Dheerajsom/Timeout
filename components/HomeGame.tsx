@@ -126,7 +126,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
       />
 
       <section className="relative mx-auto max-w-5xl text-center">
-        <h1 className="text-3xl font-black tracking-normal text-white sm:text-4xl">
+        <h1 className="hero-title text-3xl font-black tracking-normal sm:text-4xl">
           Matchups time never gave us.
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-base font-semibold leading-7 text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.55)]">
@@ -156,7 +156,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
       <section className="relative mx-auto mt-7 grid max-w-7xl items-stretch gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
         <div className="h-full rounded-md border border-white/18 bg-neutral-950 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
           <div className="mb-5 text-center">
-            <h2 className="text-3xl font-black text-white">Pick your squad</h2>
+            <h2 className="panel-title text-3xl font-black text-white">Pick your squad</h2>
           </div>
 
           {isSpinning ? (
@@ -289,7 +289,7 @@ function HistoryDialog({
       <div className="w-full max-w-2xl rounded-md border border-white/15 bg-neutral-950 text-left shadow-[0_28px_90px_rgba(0,0,0,0.5)]">
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
           <div>
-            <h2 id="history-title" className="text-lg font-black uppercase tracking-normal text-white">
+            <h2 id="history-title" className="panel-title text-lg font-black uppercase tracking-normal text-white">
               History
             </h2>
             <p className="mt-1 text-sm text-neutral-300">Your past rounds on this browser.</p>
@@ -432,8 +432,8 @@ function WheelTeam({ team }: { team: Team }) {
 function OpponentHeader({ team }: { team: Team }) {
   return (
     <div className="mb-5 text-center">
-      <div className="text-xs font-black uppercase tracking-[0.18em] text-neutral-300">Can you beat the...</div>
-      <h2 className="mt-2 text-3xl font-black leading-8 text-white">{team.franchise}</h2>
+      <div className="text-xs font-black uppercase tracking-[0.18em] text-orange-200">Can you beat the...</div>
+      <h2 className="panel-title mt-2 text-3xl font-black leading-8 text-white">{team.franchise}</h2>
     </div>
   );
 }

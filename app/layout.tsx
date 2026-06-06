@@ -40,7 +40,7 @@ export default function RootLayout({
                   />
                 </span>
                 <span className="-mt-2 text-center">
-                  <span className="block text-2xl font-black uppercase tracking-normal text-white drop-shadow-[2px_2px_0_rgba(255,107,0,0.9)] sm:text-3xl">
+                  <span className="brand-title block text-2xl font-black uppercase tracking-normal sm:text-3xl">
                     Timeout
                   </span>
                   <span className="block text-[11px] font-black uppercase tracking-[0.22em] text-orange-100 drop-shadow-[0_2px_0_rgba(124,45,18,0.95)]">
