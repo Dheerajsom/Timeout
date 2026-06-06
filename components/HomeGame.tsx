@@ -139,7 +139,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
             disabled={isSpinning || isSimulating}
             className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-orange-500 px-8 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(255,107,0,0.28)] transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <BasketballIcon className="h-5 w-5" />
+            <BasketballIcon className="h-6 w-6" />
             New Round
           </button>
           <button
@@ -231,24 +231,36 @@ function BasketballIcon({ className }: { className?: string }) {
       aria-hidden="true"
     >
       <clipPath id="newRoundBallClip">
-        <circle cx="50" cy="50" r="43" />
+        <circle cx="50" cy="50" r="42" />
       </clipPath>
-      <circle cx="50" cy="50" r="43" fill="white" />
+      <circle cx="50" cy="50" r="42" fill="white" />
       <g clipPath="url(#newRoundBallClip)">
-        <path d="M10 10L90 90M90 10L10 90" stroke="#0f172a" strokeWidth="8" />
         <path
-          d="M4 51c20 2 36-3 48-15 10-10 15-24 13-39M49 100c-2-20 3-36 15-48 10-10 24-15 39-13"
+          d="M15 19L81 85M85 18L19 84"
+          stroke="#111827"
+          strokeLinecap="square"
+          strokeWidth="8.5"
+        />
+        <path
+          d="M2 51c20 3 38-2 51-15 10-10 15-25 13-42"
           fill="none"
-          stroke="#0f172a"
+          stroke="#111827"
           strokeLinecap="round"
-          strokeWidth="8"
+          strokeWidth="8.5"
+        />
+        <path
+          d="M49 106c-2-23 4-40 17-50 10-8 24-10 42-6"
+          fill="none"
+          stroke="#111827"
+          strokeLinecap="round"
+          strokeWidth="8.5"
         />
       </g>
       <path
-        d="M50 7a43 43 0 1 1 0 86 43 43 0 0 1 0-86Z"
+        d="M50 8a42 42 0 1 1 0 84 42 42 0 0 1 0-84Z"
         fill="none"
         stroke="white"
-        strokeWidth="2"
+        strokeWidth="2.5"
       />
     </svg>
   );

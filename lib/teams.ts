@@ -1,4 +1,5 @@
 import type { Player, Team } from "@/types/simulation";
+import { modernRosterPlayers } from "@/lib/modernRosters";
 
 type PlayerTuple = [
   string,
@@ -2227,10 +2228,11 @@ function makeModernSeasonTeam(baseTeam: TeamInput, startYear: number): TeamInput
   const swing = seededRatingSwing(`${baseTeam.franchise}-${season}`);
   const phase = startYear - 2019;
   const wins = clampWins(baseTeam.wins + swing + Math.round(phase * 0.8));
-  const rolePlayers: RecentPlayerInput[] = baseTeam.players.map((player, index) => [
-    getModernRoleName(baseTeam.franchise, season, player[1], index),
-    player[1],
-  ]);
+  const rosterPlayers = modernRosterPlayers[getSeasonFranchiseKey({ season, franchise: baseTeam.franchise })];
+
+  if (!rosterPlayers) {
+    throw new Error(`Missing modern roster data for ${season} ${baseTeam.franchise}`);
+  }
 
   return makeRecentTeam({
     id: `${yearId}-${slug}`,
@@ -2251,11 +2253,11 @@ function makeModernSeasonTeam(baseTeam: TeamInput, startYear: number): TeamInput
     clutch: clampRating(baseTeam.clutch + Math.round(swing / 2)),
     physicality: clampRating(baseTeam.physicality + Math.max(0, 2020 - startYear) * 0.5),
     styleSummary: `${season} ${baseTeam.franchise} season entry generated for the full modern NBA team pool, tuned from franchise identity, pace, spacing, physicality, and roster role balance.`,
-    players: rolePlayers,
+    players: rosterPlayers,
   });
 }
 
-function getSeasonFranchiseKey(team: TeamInput) {
+function getSeasonFranchiseKey(team: Pick<TeamInput, "season" | "franchise">) {
   return `${team.season}|${team.franchise}`;
 }
 
@@ -2270,23 +2272,6 @@ function seededRatingSwing(seed: string) {
 
 function clampWins(value: number) {
   return Math.max(12, Math.min(70, Math.round(value)));
-}
-
-function getModernRoleName(franchise: string, season: string, position: Player["position"], index: number) {
-  const nickname = franchise.split(" ").at(-1) ?? franchise;
-  const roleNames = [
-    "Lead Creator",
-    "Second Option",
-    "Two-Way Wing",
-    "Interior Anchor",
-    "Connector",
-    "Bench Scorer",
-    "Defensive Stopper",
-    "Rotation Big",
-  ];
-  const positionLabel = position === "PG" ? "Guard" : position === "C" ? "Center" : position === "PF" || position === "SF" ? "Forward" : "Swing";
-
-  return `${nickname} ${roleNames[index] ?? positionLabel} ${season}`;
 }
 
 export const teams: Team[] = allTeamSeeds.map((team) => ({
