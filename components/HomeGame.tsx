@@ -3,18 +3,37 @@
 import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronRight, Dices, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { ChevronRight, Dices, History, Loader2, X } from "lucide-react";
 import { getTeamColors } from "@/lib/teamColors";
-import type { Team } from "@/types/simulation";
+import type { SimulatedGame, SimulatedSeries, Team } from "@/types/simulation";
 
 const activeRuleset = "modern";
 const spinDuration = 5000;
 const itemPitch = 94;
 const targetOffset = 62;
+const historyStorageKey = "timeout-round-history";
+const historyLimit = 30;
 
 type WheelState = {
   teams: Team[];
   targetIndex: number;
+};
+
+type RoundHistoryEntry = {
+  id: string;
+  playedAt: string;
+  userTeam: string;
+  opponentTeam: string;
+  userScore: number;
+  opponentScore: number;
+  userWon: boolean;
+  resultUrl: string;
+};
+
+type SimulationPayload = {
+  simulationId: string;
+  result: SimulatedGame | SimulatedSeries;
 };
 
 export function HomeGame({ teams }: { teams: Team[] }) {
@@ -26,6 +45,8 @@ export function HomeGame({ teams }: { teams: Team[] }) {
   const [selectedId, setSelectedId] = useState("");
   const [isSimulating, setIsSimulating] = useState(false);
   const [error, setError] = useState("");
+  const [history, setHistory] = useState<RoundHistoryEntry[]>([]);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const selected = choices.find((team) => team.id === selectedId) ?? null;
   const fallbackWheels = useMemo(
@@ -34,6 +55,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
   );
 
   useEffect(() => {
+    setHistory(readRoundHistory());
     startNewRound();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -82,7 +104,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
         ruleset: activeRuleset,
       }),
     });
-    const payload = await response.json();
+    const payload = (await response.json()) as SimulationPayload & { error?: string };
     setIsSimulating(false);
 
     if (!response.ok) {
@@ -90,6 +112,8 @@ export function HomeGame({ teams }: { teams: Team[] }) {
       return;
     }
 
+    const nextHistory = saveRoundHistory(selected, enemy, payload);
+    setHistory(nextHistory);
     router.push(`/result/${payload.simulationId}`);
   }
 
@@ -108,15 +132,25 @@ export function HomeGame({ teams }: { teams: Team[] }) {
         <p className="mx-auto mt-3 max-w-xl text-base leading-7 text-slate-300">
           A challenger appears. Spin three mystery squads and pick the one built to win.
         </p>
-        <button
-          type="button"
-          onClick={startNewRound}
-          disabled={isSpinning || isSimulating}
-          className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-md bg-orange-500 px-8 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(255,107,0,0.28)] transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <Dices className="h-4 w-4" aria-hidden="true" />
-          New Round
-        </button>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={startNewRound}
+            disabled={isSpinning || isSimulating}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-orange-500 px-8 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(255,107,0,0.28)] transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <Dices className="h-4 w-4" aria-hidden="true" />
+            New Round
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsHistoryOpen(true)}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-white/20 bg-slate-950/78 px-5 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(0,0,0,0.22)] transition hover:border-orange-300 hover:bg-slate-900"
+          >
+            <History className="h-4 w-4" aria-hidden="true" />
+            History
+          </button>
+        </div>
       </section>
 
       <section className="relative mx-auto mt-7 grid max-w-7xl items-start gap-5 lg:grid-cols-[1fr_400px]">
@@ -180,7 +214,95 @@ export function HomeGame({ teams }: { teams: Team[] }) {
           {error ? <p className="mt-3 text-sm text-orange-300">{error}</p> : null}
         </aside>
       </section>
+      <HistoryDialog
+        history={history}
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+      />
     </main>
+  );
+}
+
+function HistoryDialog({
+  history,
+  isOpen,
+  onClose,
+}: {
+  history: RoundHistoryEntry[];
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="history-title"
+      className="fixed inset-0 z-[80] flex items-end justify-center bg-black/64 px-4 py-5 backdrop-blur-sm sm:items-center"
+    >
+      <div className="w-full max-w-2xl rounded-md border border-white/15 bg-neutral-950 text-left shadow-[0_28px_90px_rgba(0,0,0,0.5)]">
+        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+          <div>
+            <h2 id="history-title" className="text-lg font-black uppercase tracking-normal text-white">
+              History
+            </h2>
+            <p className="mt-1 text-sm text-white/55">Your past rounds on this browser.</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close history"
+            className="grid h-10 w-10 place-items-center rounded-md border border-white/15 text-white transition hover:border-orange-300 hover:bg-white/10"
+          >
+            <X className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="max-h-[64vh] overflow-y-auto p-3 sm:p-4">
+          {history.length ? (
+            <div className="space-y-3">
+              {history.map((round) => (
+                <Link
+                  key={round.id}
+                  href={round.resultUrl}
+                  onClick={onClose}
+                  className="grid gap-3 rounded-md border border-white/10 bg-white/[0.045] p-4 transition hover:border-orange-300 hover:bg-white/[0.075] sm:grid-cols-[auto_1fr_auto] sm:items-center"
+                >
+                  <span
+                    className={`inline-flex h-8 items-center justify-center rounded-md px-3 text-xs font-black uppercase ${
+                      round.userWon ? "bg-emerald-400 text-emerald-950" : "bg-rose-400 text-rose-950"
+                    }`}
+                  >
+                    {round.userWon ? "Win" : "Loss"}
+                  </span>
+                  <span>
+                    <span className="block text-sm font-black text-white">
+                      {round.userTeam} vs {round.opponentTeam}
+                    </span>
+                    <span className="mt-1 block text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
+                      {formatHistoryDate(round.playedAt)}
+                    </span>
+                  </span>
+                  <span className="text-right text-lg font-black text-white">
+                    {round.userScore}-{round.opponentScore}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="grid min-h-[180px] place-items-center rounded-md border border-dashed border-white/15 bg-white/[0.035] p-6 text-center">
+              <div>
+                <div className="text-base font-black text-white">No rounds yet</div>
+                <p className="mt-2 text-sm leading-6 text-white/55">Spin, pick a squad, and simulate to start building your History.</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -344,4 +466,74 @@ function buildWheelForTarget(pool: Team[], target: Team, wheelIndex: number): Wh
     teams: wheel,
     targetIndex,
   };
+}
+
+function readRoundHistory() {
+  try {
+    const raw = window.localStorage.getItem(historyStorageKey);
+    if (!raw) {
+      return [];
+    }
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.filter(isRoundHistoryEntry).slice(0, historyLimit);
+  } catch {
+    return [];
+  }
+}
+
+function saveRoundHistory(userTeam: Team, opponentTeam: Team, payload: SimulationPayload) {
+  const result = payload.result;
+  const game = result.type === "single_game" ? result : result.decidingGame;
+  const userIsTeamA = result.teamA.id === userTeam.id;
+  const entry: RoundHistoryEntry = {
+    id: payload.simulationId,
+    playedAt: new Date().toISOString(),
+    userTeam: `${userTeam.season} ${userTeam.franchise}`,
+    opponentTeam: `${opponentTeam.season} ${opponentTeam.franchise}`,
+    userScore: userIsTeamA ? game.teamAScore : game.teamBScore,
+    opponentScore: userIsTeamA ? game.teamBScore : game.teamAScore,
+    userWon: result.winnerTeamId === userTeam.id,
+    resultUrl: `/result/${payload.simulationId}`,
+  };
+  const nextHistory = [entry, ...readRoundHistory().filter((round) => round.id !== entry.id)].slice(0, historyLimit);
+
+  try {
+    window.localStorage.setItem(historyStorageKey, JSON.stringify(nextHistory));
+  } catch {
+    return nextHistory;
+  }
+
+  return nextHistory;
+}
+
+function isRoundHistoryEntry(value: unknown): value is RoundHistoryEntry {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const entry = value as Partial<RoundHistoryEntry>;
+  return (
+    typeof entry.id === "string" &&
+    typeof entry.playedAt === "string" &&
+    typeof entry.userTeam === "string" &&
+    typeof entry.opponentTeam === "string" &&
+    typeof entry.userScore === "number" &&
+    typeof entry.opponentScore === "number" &&
+    typeof entry.userWon === "boolean" &&
+    typeof entry.resultUrl === "string"
+  );
+}
+
+function formatHistoryDate(value: string) {
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
 }

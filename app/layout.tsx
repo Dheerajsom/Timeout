@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Code2 } from "lucide-react";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -46,9 +47,22 @@ export default function RootLayout({
                   </span>
                 </span>
               </Link>
+              <a
+                href="https://github.com/Dheerajsom/Timeout"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Open Timeout on GitHub"
+                className="absolute right-4 top-4 inline-flex h-11 items-center justify-center gap-2 rounded-md border border-white/20 bg-slate-950/80 px-3 text-xs font-black uppercase tracking-normal text-white shadow-[0_14px_36px_rgba(0,0,0,0.28)] transition hover:border-orange-300 hover:bg-orange-500 sm:right-6 sm:px-4 lg:right-8"
+              >
+                <Code2 className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">GitHub</span>
+              </a>
             </div>
           </header>
           {children}
+          <footer className="relative z-40 px-4 pb-6 text-center text-xs font-semibold uppercase tracking-[0.14em] text-white/55 sm:px-6 lg:px-8">
+            Timeout is an independent project and not affiliated with the NBA.
+          </footer>
         </div>
       </body>
     </html>
