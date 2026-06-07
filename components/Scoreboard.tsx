@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { RotateCcw } from "lucide-react";
 import type { CSSProperties } from "react";
 import type { SimulatedGame, SimulatedSeries, Team } from "@/types/simulation";
 import { getTeamColors } from "@/lib/teamColors";
@@ -21,11 +23,27 @@ export function Scoreboard({ result }: { result: SimulatedGame | SimulatedSeries
         </div>
         <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr] md:items-stretch">
           <ScoreTeam team={result.teamA} score={game.teamAScore} isWinner={winnerId === result.teamA.id} align="left" />
-          <div className="hidden place-items-center rounded border border-white/15 bg-neutral-900 px-5 text-sm font-black uppercase tracking-[0.28em] text-neutral-100 md:grid">
-            Final
+          <div className="hidden min-w-[124px] grid-rows-[1fr_auto] gap-3 md:grid">
+            <div className="grid place-items-center rounded border border-white/15 bg-neutral-900 px-5 text-sm font-black uppercase tracking-[0.28em] text-neutral-100">
+              Final
+            </div>
+            <Link
+              href={`/?teamA=${result.teamA.id}&teamB=${result.teamB.id}`}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-orange-500 px-4 text-sm font-black uppercase text-white shadow-[0_0_26px_rgba(249,115,22,0.52),0_12px_30px_rgba(255,107,0,0.28)] transition hover:bg-orange-400"
+            >
+              <RotateCcw className="h-4 w-4" aria-hidden="true" />
+              Run It Back
+            </Link>
           </div>
           <ScoreTeam team={result.teamB} score={game.teamBScore} isWinner={winnerId === result.teamB.id} align="right" />
         </div>
+        <Link
+          href={`/?teamA=${result.teamA.id}&teamB=${result.teamB.id}`}
+          className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-orange-500 px-4 text-sm font-black uppercase text-white shadow-[0_0_26px_rgba(249,115,22,0.52),0_12px_30px_rgba(255,107,0,0.28)] transition hover:bg-orange-400 md:hidden"
+        >
+          <RotateCcw className="h-4 w-4" aria-hidden="true" />
+          Run It Back
+        </Link>
         {result.type === "best_of_7" ? (
           <p className="mt-4 text-sm font-semibold text-neutral-200">
             {result.teamA.name} {result.teamAWins}, {result.teamB.name} {result.teamBWins}

@@ -1,6 +1,4 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { RotateCcw } from "lucide-react";
 import { BoxScoreTable } from "@/components/BoxScoreTable";
 import { MatchupFactors } from "@/components/MatchupFactors";
 import { MvpCard } from "@/components/MvpCard";
@@ -25,19 +23,16 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
       <Scoreboard result={result} />
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-[340px_1fr] lg:items-start">
-          <div className="space-y-5">
+          <div className="order-1 lg:col-start-1 lg:row-start-1">
             <MvpCard mvp={result.mvp} />
-            <MatchupFactors factors={result.matchupFactors} teams={[result.teamA, result.teamB]} />
-            <Link
-              href={`/?teamA=${result.teamA.id}&teamB=${result.teamB.id}`}
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-white px-4 text-sm font-semibold text-ink transition hover:bg-teal"
-            >
-              <RotateCcw className="h-4 w-4" aria-hidden="true" />
-              Run It Back
-            </Link>
           </div>
-          <div className="space-y-4">
+          <div className="order-3 lg:col-start-2 lg:row-start-1">
             <BoxScoreTable team={result.teamA} players={game.teamABoxScore} />
+          </div>
+          <div className="order-2 lg:col-start-1 lg:row-start-2">
+            <MatchupFactors factors={result.matchupFactors} teams={[result.teamA, result.teamB]} />
+          </div>
+          <div className="order-4 lg:col-start-2 lg:row-start-2">
             <BoxScoreTable team={result.teamB} players={game.teamBBoxScore} />
           </div>
         </div>

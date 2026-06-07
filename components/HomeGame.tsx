@@ -208,7 +208,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
           </div>
         </div>
 
-        <aside className="h-full rounded-md border border-white/18 bg-neutral-950 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+        <aside className="self-start overflow-hidden rounded-md border border-white/18 bg-neutral-950 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
           {enemy ? <OpponentHeader team={enemy} /> : null}
           {enemy ? <TeamCard team={enemy} opponent /> : <EmptyPanel label="New Round sets the matchup." />}
           {error ? <p className="mt-3 text-sm text-orange-300">{error}</p> : null}
@@ -368,7 +368,7 @@ function TeamCard({
   return (
     <div
       style={style}
-      className={`team-card ${opponent ? "min-h-[220px]" : "h-full"} rounded-md border p-4 ${
+      className={`team-card ${opponent ? "h-[220px] w-full" : "h-full"} rounded-md border p-4 ${
         selected
           ? "border-orange-300 shadow-[0_0_0_2px_rgba(251,146,60,0.38),0_18px_40px_rgba(0,0,0,0.28)]"
           : opponent
@@ -376,7 +376,7 @@ function TeamCard({
             : "border-slate-700"
       }`}
     >
-      <div className="flex min-h-[170px] flex-col justify-between">
+      <div className="flex h-full min-h-[170px] flex-col justify-between">
         <TeamMark team={team} />
         <div>
           <div className="text-xs font-black uppercase tracking-[0.16em] text-white/85">{team.season}</div>
