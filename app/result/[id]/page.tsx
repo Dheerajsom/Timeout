@@ -22,17 +22,13 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
     <main>
       <Scoreboard result={result} />
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid gap-5 lg:grid-cols-[340px_1fr] lg:items-start">
-          <div className="order-1 lg:col-start-1 lg:row-start-1">
+        <div className="grid gap-5 lg:grid-cols-[340px_1fr] lg:items-stretch">
+          <div className="flex h-full flex-col justify-between gap-5">
             <MvpCard mvp={result.mvp} />
-          </div>
-          <div className="order-3 lg:col-start-2 lg:row-start-1">
-            <BoxScoreTable team={result.teamA} players={game.teamABoxScore} />
-          </div>
-          <div className="order-2 lg:col-start-1 lg:row-start-2">
             <MatchupFactors factors={result.matchupFactors} teams={[result.teamA, result.teamB]} />
           </div>
-          <div className="order-4 lg:col-start-2 lg:row-start-2">
+          <div className="space-y-5">
+            <BoxScoreTable team={result.teamA} players={game.teamABoxScore} />
             <BoxScoreTable team={result.teamB} players={game.teamBBoxScore} />
           </div>
         </div>
