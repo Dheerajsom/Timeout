@@ -33,7 +33,7 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
 
-        <div className="mt-5 space-y-5">
+        <div className="mt-3 space-y-5">
           {result.type === "best_of_7" ? <SeriesSummary series={result} /> : null}
           <TeamRadarChart teamA={result.teamA} teamB={result.teamB} />
         </div>
