@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getSimulation } from "@/lib/simulationStore";
-import { getTeamColors } from "@/lib/teamColors";
+import { getTeamColors, type TeamColors } from "@/lib/teamColors";
+import type { Team } from "@/types/simulation";
 
 export const size = {
   width: 1200,
@@ -44,19 +45,15 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   const winner = result.winnerTeamId === userTeam.id ? userTeam : opponent;
   const loser = result.winnerTeamId === userTeam.id ? opponent : userTeam;
   const colors = getTeamColors(winner);
-  const winnerLabel = `${winner.season} ${winner.franchise}`;
-  const loserLabel = `${loser.season} ${loser.franchise}`;
-  const userTeamLabel = `${userTeam.season} ${userTeam.franchise}`;
-  const opponentLabel = `${opponent.season} ${opponent.franchise}`;
-  const winnerScore = result.winnerTeamId === result.teamA.id ? game.teamAScore : game.teamBScore;
-  const loserScore = result.winnerTeamId === result.teamA.id ? game.teamBScore : game.teamAScore;
-  const scoreLabel = `${winnerScore}-${loserScore}`;
+  const accentColor = getVisibleAccent(colors);
+  const winnerScore = scoreForTeam(winner.id, game.teamA.id, game.teamAScore, game.teamBScore);
+  const loserScore = scoreForTeam(loser.id, game.teamA.id, game.teamAScore, game.teamBScore);
 
   return new ImageResponse(
     (
       <div
         style={{
-          background: "#0b0b0c",
+          background: `linear-gradient(135deg, #050506 0%, #101114 54%, ${hexToRgba(colors.primary, 0.24)} 100%)`,
           color: "white",
           display: "flex",
           height: "100%",
@@ -66,184 +63,189 @@ export default async function Image({ params }: { params: Promise<{ id: string }
       >
         <div
           style={{
-            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primary} 48%, ${colors.secondary} 48%, #111111 68%, #0d0d0e 100%)`,
-            border: "4px solid rgba(255,255,255,0.24)",
-            borderRadius: 18,
-            boxShadow: "0 36px 100px rgba(0,0,0,0.48)",
+            background: "#101113",
+            border: "2px solid rgba(255,255,255,0.18)",
+            borderRadius: 8,
+            boxShadow: "0 34px 90px rgba(0,0,0,0.52)",
             display: "flex",
             flexDirection: "column",
             height: "100%",
-            justifyContent: "space-between",
             overflow: "hidden",
-            padding: 34,
+            padding: 36,
             position: "relative",
             width: "100%",
           }}
         >
           <div
             style={{
-              background: "linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0) 36%)",
+              background: `linear-gradient(135deg, ${hexToRgba(colors.primary, 0.32)} 0%, rgba(255,255,255,0.035) 42%, transparent 78%)`,
               display: "flex",
-              inset: 0,
+              height: "100%",
+              left: 0,
               position: "absolute",
+              top: 0,
+              width: "100%",
             }}
           />
           <div
             style={{
-              background: "linear-gradient(90deg, rgba(0,0,0,0.28), rgba(0,0,0,0.08) 42%, rgba(0,0,0,0.54))",
+              background: `linear-gradient(180deg, ${hexToRgba(accentColor, 0.18)}, transparent 36%)`,
               display: "flex",
-              inset: 0,
+              height: 220,
+              left: 0,
               position: "absolute",
+              top: 0,
+              width: "100%",
             }}
           />
 
-          <div style={{ display: "flex", gap: 28, height: 318, position: "relative", width: "100%" }}>
-            <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "space-between", minWidth: 0 }}>
+          <div
+            style={{
+              alignItems: "center",
+              display: "flex",
+              height: 56,
+              justifyContent: "space-between",
+              position: "relative",
+              width: "100%",
+            }}
+          >
+            <div style={{ alignItems: "center", display: "flex", gap: 14 }}>
               <div
                 style={{
-                  border: "2px solid rgba(255,255,255,0.22)",
-                  borderRadius: 10,
+                  background: accentColor,
+                  borderRadius: 3,
+                  display: "flex",
+                  height: 34,
+                  width: 8,
+                }}
+              />
+              <div
+                style={{
                   color: "rgba(255,255,255,0.86)",
                   display: "flex",
-                  fontSize: 23,
+                  fontSize: 26,
                   fontWeight: 900,
-                  letterSpacing: 5,
-                  padding: "9px 16px",
                   textTransform: "uppercase",
-                  width: 300,
                 }}
               >
                 Timeout Result
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 12, width: 735 }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  <div style={{ color: "rgba(255,255,255,0.72)", display: "flex", fontSize: 23, fontWeight: 900, letterSpacing: 4, textTransform: "uppercase" }}>
-                    Winner
-                  </div>
-                  <div style={{ display: "flex", fontSize: 52, fontWeight: 900, lineHeight: 0.98 }}>
-                    {winnerLabel}
-                  </div>
-                </div>
-
-                <div style={{ alignItems: "center", display: "flex", gap: 18 }}>
-                  <div style={{ background: "rgba(255,255,255,0.58)", display: "flex", height: 2, width: 64 }} />
-                  <div style={{ color: "rgba(255,255,255,0.86)", display: "flex", fontSize: 24, fontWeight: 900, letterSpacing: 4, textTransform: "uppercase" }}>
-                    beat
-                  </div>
-                  <div style={{ background: "rgba(255,255,255,0.58)", display: "flex", flex: 1, height: 2 }} />
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  <div style={{ color: "rgba(255,255,255,0.72)", display: "flex", fontSize: 21, fontWeight: 900, letterSpacing: 4, textTransform: "uppercase" }}>
-                    Opponent
-                  </div>
-                  <div style={{ display: "flex", fontSize: 42, fontWeight: 900, lineHeight: 1 }}>
-                    {loserLabel}
-                  </div>
-                </div>
               </div>
             </div>
 
             <div
               style={{
                 alignItems: "center",
-                background: "rgba(255,255,255,0.96)",
-                borderRadius: 14,
-                boxShadow: "0 18px 40px rgba(0,0,0,0.32)",
-                color: "#111111",
+                background: userWon ? "#a7f3d0" : "#fda4af",
+                borderRadius: 8,
+                color: userWon ? "#064e3b" : "#881337",
                 display: "flex",
-                flexDirection: "column",
-                height: 124,
+                fontSize: 26,
+                fontWeight: 900,
+                height: 46,
                 justifyContent: "center",
-                padding: "0 30px",
-                width: 250,
+                padding: "0 22px",
+                textTransform: "uppercase",
               }}
             >
-              <div style={{ color: "#555555", display: "flex", fontSize: 18, fontWeight: 900, letterSpacing: 3, textTransform: "uppercase" }}>
-                Final
-              </div>
-              <div style={{ display: "flex", fontSize: 50, fontWeight: 900, lineHeight: 1 }}>
-                {scoreLabel}
-              </div>
+              {userWon ? "I won!" : "I lost!"}
             </div>
           </div>
 
-          <div style={{ alignItems: "stretch", display: "flex", gap: 22, height: 166, position: "relative", width: "100%" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 18,
+              marginTop: 24,
+              position: "relative",
+              width: "100%",
+            }}
+          >
             <div
               style={{
-                background: "rgba(0,0,0,0.42)",
-                border: "3px solid rgba(255,255,255,0.18)",
-                borderRadius: 16,
-                color: "white",
+                alignItems: "center",
+                color: "rgba(255,255,255,0.5)",
                 display: "flex",
-                flexDirection: "column",
-                flex: 1,
+                fontSize: 17,
+                fontWeight: 900,
                 justifyContent: "space-between",
-                padding: "20px 28px",
+                textTransform: "uppercase",
+                width: "100%",
               }}
             >
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ color: "#fed7aa", display: "flex", fontSize: 20, fontWeight: 900, letterSpacing: 4, textTransform: "uppercase" }}>
-                  MVP
-                </div>
-                <div style={{ display: "flex", fontSize: 34, fontWeight: 900, lineHeight: 1.02 }}>
-                  {result.mvp.name}
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: 12, width: "100%" }}>
-                <OgStat label="PTS" value={result.mvp.points} />
-                <OgStat label="REB" value={result.mvp.rebounds} />
-                <OgStat label="AST" value={result.mvp.assists} />
-              </div>
+              <div style={{ display: "flex" }}>Matchup</div>
+              <div style={{ display: "flex", justifyContent: "center", width: 156 }}>Final</div>
             </div>
 
+            <TeamScoreRow
+              accentColor={accentColor}
+              colors={colors}
+              contextLabel={winner.id === userTeam.id ? "My pick" : "Opponent"}
+              highlighted
+              role="Winner"
+              score={winnerScore}
+              team={winner}
+            />
+
+            <TeamScoreRow
+              accentColor={accentColor}
+              colors={colors}
+              contextLabel={loser.id === userTeam.id ? "My pick" : "Opponent"}
+              role="Beaten"
+              score={loserScore}
+              team={loser}
+            />
+          </div>
+
+          <div
+            style={{
+              alignItems: "center",
+              background: "rgba(255,255,255,0.06)",
+              border: "2px solid rgba(255,255,255,0.12)",
+              borderRadius: 8,
+              display: "flex",
+              height: 82,
+              marginTop: 24,
+              padding: "0 24px",
+              position: "relative",
+              width: "100%",
+            }}
+          >
             <div
               style={{
-                background: "rgba(255,255,255,0.1)",
-                border: "3px solid rgba(255,255,255,0.18)",
-                borderRadius: 16,
+                alignItems: "center",
+                background: hexToRgba(accentColor, 0.16),
+                border: `2px solid ${hexToRgba(accentColor, 0.42)}`,
+                borderRadius: 8,
+                color: "#ffffff",
                 display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                padding: "20px 28px",
-                width: 472,
+                fontSize: 19,
+                fontWeight: 900,
+                height: 42,
+                justifyContent: "center",
+                marginRight: 18,
+                textTransform: "uppercase",
+                width: 76,
               }}
             >
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ alignItems: "center", display: "flex", gap: 14 }}>
-                  <div style={{ color: "#fed7aa", display: "flex", fontSize: 18, fontWeight: 900, letterSpacing: 4, textTransform: "uppercase" }}>
-                    My pick
-                  </div>
-                  <div
-                    style={{
-                      background: userWon ? "#a7f3d0" : "#fda4af",
-                      borderRadius: 8,
-                      color: userWon ? "#064e3b" : "#881337",
-                      display: "flex",
-                      fontSize: 16,
-                      fontWeight: 900,
-                      letterSpacing: 2,
-                      padding: "6px 10px",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {userWon ? "Won" : "Lost"}
-                  </div>
-                </div>
-                <div style={{ display: "flex", fontSize: 26, fontWeight: 900, lineHeight: 1.04 }}>
-                  {userTeamLabel}
-                </div>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ color: "#fed7aa", display: "flex", fontSize: 18, fontWeight: 900, letterSpacing: 4, textTransform: "uppercase" }}>
-                  Opponent
-                </div>
-                <div style={{ display: "flex", fontSize: 26, fontWeight: 900, lineHeight: 1.04 }}>
-                  {opponentLabel}
-                </div>
-              </div>
+              MVP
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flex: 1,
+                fontSize: result.mvp.name.length > 21 ? 28 : 32,
+                fontWeight: 900,
+                lineHeight: 1,
+                minWidth: 0,
+              }}
+            >
+              {result.mvp.name}
+            </div>
+            <div style={{ alignItems: "center", display: "flex", gap: 10 }}>
+              <MvpStat label="PTS" value={result.mvp.points} />
+              <MvpStat label="REB" value={result.mvp.rebounds} />
+              <MvpStat label="AST" value={result.mvp.assists} />
             </div>
           </div>
         </div>
@@ -253,23 +255,210 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   );
 }
 
-function OgStat({ label, value }: { label: string; value: number }) {
+function TeamScoreRow({
+  accentColor,
+  colors,
+  contextLabel,
+  highlighted = false,
+  role,
+  score,
+  team,
+}: {
+  accentColor: string;
+  colors: TeamColors;
+  contextLabel: "My pick" | "Opponent";
+  highlighted?: boolean;
+  role: "Winner" | "Beaten";
+  score: number;
+  team: Team;
+}) {
+  const franchiseSize = getFranchiseFontSize(team.franchise, highlighted);
+
+  return (
+    <div
+      style={{
+        alignItems: "stretch",
+        background: highlighted
+          ? `linear-gradient(90deg, ${hexToRgba(colors.primary, 0.56)} 0%, ${hexToRgba(colors.primary, 0.24)} 48%, rgba(255,255,255,0.075) 100%)`
+          : "rgba(255,255,255,0.045)",
+        border: highlighted ? `2px solid ${hexToRgba(accentColor, 0.58)}` : "2px solid rgba(255,255,255,0.11)",
+        borderRadius: 8,
+        boxShadow: highlighted ? `0 18px 50px ${hexToRgba(colors.primary, 0.25)}` : "none",
+        display: "flex",
+        height: highlighted ? 138 : 128,
+        overflow: "hidden",
+        width: "100%",
+      }}
+    >
+      <div
+        style={{
+          background: highlighted ? accentColor : hexToRgba(accentColor, 0.45),
+          display: "flex",
+          width: 10,
+        }}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          flex: 1,
+          flexDirection: "column",
+          justifyContent: "center",
+          minWidth: 0,
+          padding: "0 26px",
+        }}
+      >
+        <div style={{ alignItems: "center", display: "flex", gap: 12 }}>
+          <div
+            style={{
+              color: highlighted ? "rgba(255,255,255,0.86)" : "rgba(255,255,255,0.58)",
+              display: "flex",
+              fontSize: 19,
+              fontWeight: 900,
+              textTransform: "uppercase",
+            }}
+          >
+            {role}
+          </div>
+          <div
+            style={{
+              background: contextLabel === "My pick" ? hexToRgba(accentColor, 0.22) : "rgba(255,255,255,0.09)",
+              border: contextLabel === "My pick" ? `2px solid ${hexToRgba(accentColor, 0.45)}` : "2px solid rgba(255,255,255,0.12)",
+              borderRadius: 6,
+              color: "rgba(255,255,255,0.88)",
+              display: "flex",
+              fontSize: 16,
+              fontWeight: 900,
+              padding: "5px 10px",
+              textTransform: "uppercase",
+            }}
+          >
+            {contextLabel}
+          </div>
+        </div>
+
+        <div
+          style={{
+            color: highlighted ? "rgba(255,255,255,0.66)" : "rgba(255,255,255,0.5)",
+            display: "flex",
+            fontSize: 22,
+            fontWeight: 800,
+            marginTop: 8,
+          }}
+        >
+          {team.season}
+        </div>
+        <div
+          style={{
+            color: "#ffffff",
+            display: "flex",
+            fontSize: franchiseSize,
+            fontWeight: 900,
+            lineHeight: 1,
+            marginTop: 4,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {team.franchise}
+        </div>
+      </div>
+
+      <div
+        style={{
+          alignItems: "center",
+          background: highlighted ? "rgba(255,255,255,0.93)" : "rgba(255,255,255,0.075)",
+          borderLeft: "2px solid rgba(255,255,255,0.12)",
+          color: highlighted ? "#0d0d0f" : "rgba(255,255,255,0.82)",
+          display: "flex",
+          fontSize: highlighted ? 74 : 64,
+          fontWeight: 900,
+          justifyContent: "center",
+          width: 156,
+        }}
+      >
+        {score}
+      </div>
+    </div>
+  );
+}
+
+function MvpStat({ label, value }: { label: string; value: number }) {
   return (
     <div
       style={{
         alignItems: "center",
-        background: "rgba(255,255,255,0.14)",
-        border: "2px solid rgba(255,255,255,0.22)",
-        borderRadius: 12,
+        background: "rgba(255,255,255,0.08)",
+        border: "2px solid rgba(255,255,255,0.12)",
+        borderRadius: 8,
         display: "flex",
         flexDirection: "column",
-        flex: 1,
-        height: 60,
+        height: 50,
         justifyContent: "center",
+        width: 88,
       }}
     >
-      <div style={{ display: "flex", fontSize: 25, fontWeight: 900 }}>{value}</div>
-      <div style={{ color: "#fed7aa", display: "flex", fontSize: 13, fontWeight: 900 }}>{label}</div>
+      <div style={{ color: "#ffffff", display: "flex", fontSize: 24, fontWeight: 900, lineHeight: 1 }}>{value}</div>
+      <div style={{ color: "rgba(255,255,255,0.58)", display: "flex", fontSize: 12, fontWeight: 900, marginTop: 3 }}>{label}</div>
     </div>
   );
+}
+
+function scoreForTeam(teamId: string, teamAId: string, teamAScore: number, teamBScore: number) {
+  return teamId === teamAId ? teamAScore : teamBScore;
+}
+
+function getFranchiseFontSize(franchise: string, highlighted: boolean) {
+  if (franchise.length > 22) {
+    return highlighted ? 44 : 38;
+  }
+
+  if (franchise.length > 18) {
+    return highlighted ? 48 : 40;
+  }
+
+  return highlighted ? 54 : 44;
+}
+
+function getVisibleAccent(colors: TeamColors) {
+  return [colors.primary, colors.secondary, colors.accent].find((color) => getLuminance(color) > 45) ?? "#f8fafc";
+}
+
+function getLuminance(hex: string) {
+  const rgb = parseHex(hex);
+
+  if (!rgb) {
+    return 255;
+  }
+
+  return 0.2126 * rgb.red + 0.7152 * rgb.green + 0.0722 * rgb.blue;
+}
+
+function hexToRgba(hex: string, alpha: number) {
+  const rgb = parseHex(hex);
+
+  if (!rgb) {
+    return `rgba(255,255,255,${alpha})`;
+  }
+
+  return `rgba(${rgb.red},${rgb.green},${rgb.blue},${alpha})`;
+}
+
+function parseHex(hex: string) {
+  const value = hex.replace("#", "");
+
+  if (value.length !== 6) {
+    return null;
+  }
+
+  const numeric = Number.parseInt(value, 16);
+
+  if (Number.isNaN(numeric)) {
+    return null;
+  }
+
+  return {
+    red: (numeric >> 16) & 255,
+    green: (numeric >> 8) & 255,
+    blue: numeric & 255,
+  };
 }
