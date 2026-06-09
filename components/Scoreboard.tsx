@@ -11,9 +11,10 @@ export function Scoreboard({ result, simulationId }: { result: SimulatedGame | S
   const winnerId = result.winnerTeamId;
   const actionClassName =
     "inline-flex h-11 items-center justify-center gap-2 rounded-md bg-orange-500 px-4 text-sm font-black uppercase text-white shadow-[0_0_26px_rgba(249,115,22,0.52),0_12px_30px_rgba(255,107,0,0.28)] transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-60";
+  const runItBackClassName = `${actionClassName} relative -top-0.5`;
 
   return (
-    <section className="border-b border-white/10 bg-neutral-950">
+    <section className="bg-neutral-950">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-5 flex flex-wrap items-center gap-3 text-neutral-100">
           <RulesetBadge ruleset={result.ruleset} />
@@ -33,7 +34,7 @@ export function Scoreboard({ result, simulationId }: { result: SimulatedGame | S
             <ShareButton simulationId={simulationId} className={actionClassName} />
             <Link
               href={`/?teamA=${result.teamA.id}&teamB=${result.teamB.id}`}
-              className={actionClassName}
+              className={runItBackClassName}
             >
               <RotateCcw className="h-4 w-4" aria-hidden="true" />
               Run It Back
@@ -45,17 +46,13 @@ export function Scoreboard({ result, simulationId }: { result: SimulatedGame | S
           <ShareButton simulationId={simulationId} className={`${actionClassName} w-full`} />
           <Link
             href={`/?teamA=${result.teamA.id}&teamB=${result.teamB.id}`}
-            className={`${actionClassName} w-full`}
+            className={`${runItBackClassName} w-full`}
           >
             <RotateCcw className="h-4 w-4" aria-hidden="true" />
             Run It Back
           </Link>
         </div>
-        {result.type === "best_of_7" ? (
-          <p className="mt-4 text-sm font-semibold text-neutral-200">
-            {result.teamA.name} {result.teamAWins}, {result.teamB.name} {result.teamBWins}
-          </p>
-        ) : null}
+        <div className="mx-auto mt-7 h-px w-full max-w-4xl bg-white/[0.08]" aria-hidden="true" />
       </div>
     </section>
   );

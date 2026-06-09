@@ -7,6 +7,7 @@ import { Scoreboard } from "@/components/Scoreboard";
 import { SeriesSummary } from "@/components/SeriesSummary";
 import { TeamRadarChart } from "@/components/TeamRadarChart";
 import { buildShareSummary } from "@/lib/shareSummary";
+import { getSiteOrigin } from "@/lib/siteUrl";
 import { getSimulation } from "@/lib/simulationStore";
 
 type ResultPageProps = {
@@ -24,20 +25,36 @@ export async function generateMetadata({ params }: ResultPageProps): Promise<Met
     };
   }
 
+  const origin = getSiteOrigin();
   const summary = buildShareSummary(simulation.result);
+  const resultUrl = new URL(`/result/${id}`, origin).toString();
+  const imageUrl = new URL(`/share/${id}/opengraph-image`, origin).toString();
 
   return {
     title: summary.title,
     description: summary.description,
+    alternates: {
+      canonical: resultUrl,
+    },
     openGraph: {
       title: summary.title,
       description: summary.description,
       type: "website",
+      url: resultUrl,
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: summary.title,
+        },
+      ],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: summary.title,
       description: summary.description,
+      images: [imageUrl],
     },
   };
 }

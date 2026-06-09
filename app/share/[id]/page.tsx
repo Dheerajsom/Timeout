@@ -113,10 +113,7 @@ export default async function SharePage({ params }: SharePageProps) {
                   <span className="mx-2 text-white/40">-</span>
                   {opponentScore}
                 </div>
-                <p className="mt-4 text-base font-black uppercase tracking-[0.12em] text-orange-100/88">
-                  {userTeam.season} {userTeam.franchise} vs {opponent.season} {opponent.franchise}
-                </p>
-                <h1 className="mt-2 text-2xl font-black leading-tight text-white sm:text-3xl">
+                <h1 className="mt-4 text-2xl font-black leading-tight text-white sm:text-3xl">
                   {winner.season} {winner.franchise} win
                 </h1>
               </div>
@@ -159,14 +156,17 @@ export default async function SharePage({ params }: SharePageProps) {
             </div>
           </div>
 
-          <div className="relative flex justify-center border-t border-white/12 bg-black/30 p-4 sm:justify-end">
-            <Link
-              href={`/result/${id}`}
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-orange-500 px-4 text-sm font-black uppercase text-white shadow-[0_0_24px_rgba(249,115,22,0.38)] transition hover:bg-orange-400 sm:w-auto"
-            >
-              Full Box Score
-              <ExternalLink className="h-4 w-4" aria-hidden="true" />
-            </Link>
+          <div className="relative bg-black/30 p-4">
+            <div className="mb-4 h-px w-full max-w-sm bg-white/12" aria-hidden="true" />
+            <div className="flex justify-start">
+              <Link
+                href={`/result/${id}`}
+                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-orange-500 px-4 text-sm font-black uppercase text-white shadow-[0_0_24px_rgba(249,115,22,0.38)] transition hover:bg-orange-400 sm:w-auto"
+              >
+                Full Box Score
+                <ExternalLink className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
