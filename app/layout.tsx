@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Analytics } from "@vercel/analytics/next";
 import { Code2 } from "lucide-react";
+import { PublicShareHostRedirect } from "@/components/PublicShareHostRedirect";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
+        <PublicShareHostRedirect />
         <CourtBackground />
         <div className="min-h-screen">
           <header className="relative z-50">
