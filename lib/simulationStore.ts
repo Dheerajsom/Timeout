@@ -36,6 +36,12 @@ export async function readSimulations(): Promise<SavedSimulation[]> {
 }
 
 function encodeSimulationId(simulation: SavedSimulation) {
+  const cleanId = encodeCleanSimulationId(simulation);
+
+  if (cleanId) {
+    return cleanId;
+  }
+
   const payload = JSON.stringify({
     teamAId: simulation.teamAId,
     teamBId: simulation.teamBId,
@@ -48,6 +54,12 @@ function encodeSimulationId(simulation: SavedSimulation) {
 }
 
 function decodeSimulationId(id: string): SavedSimulation | null {
+  const cleanSimulation = decodeCleanSimulationId(id);
+
+  if (cleanSimulation) {
+    return cleanSimulation;
+  }
+
   if (!id.startsWith("sim_")) {
     return null;
   }
@@ -60,27 +72,85 @@ function decodeSimulationId(id: string): SavedSimulation | null {
       return null;
     }
 
-    const pair = getTeamPair(parsed.data.teamAId, parsed.data.teamBId);
-    if (!pair) {
-      return null;
-    }
-
-    const result =
-      parsed.data.mode === "single_game"
-        ? simulateGame({ ...pair, ruleset: parsed.data.ruleset, seed: parsed.data.seed })
-        : simulateSeries({ ...pair, ruleset: parsed.data.ruleset, seed: parsed.data.seed });
-
-    return {
-      id,
-      teamAId: parsed.data.teamAId,
-      teamBId: parsed.data.teamBId,
-      mode: parsed.data.mode,
-      ruleset: parsed.data.ruleset,
-      seed: parsed.data.seed,
-      result,
-      createdAt: new Date(0).toISOString(),
-    };
+    return buildDecodedSimulation(id, { ...parsed.data, seed: parsed.data.seed });
   } catch {
     return null;
   }
+}
+
+function encodeCleanSimulationId(simulation: SavedSimulation) {
+  const safeSlug = /^[-a-z0-9]+$/;
+
+  if (
+    !safeSlug.test(simulation.teamAId) ||
+    !safeSlug.test(simulation.teamBId) ||
+    !safeSlug.test(simulation.seed) ||
+    simulation.teamAId.includes("-vs-") ||
+    simulation.teamBId.includes("-vs-")
+  ) {
+    return null;
+  }
+
+  const modeSlug = simulation.mode === "single_game" ? "game" : "series";
+  return `${simulation.teamAId}-vs-${simulation.teamBId}__${modeSlug}__${simulation.ruleset}__${simulation.seed}`;
+}
+
+function decodeCleanSimulationId(id: string): SavedSimulation | null {
+  const [matchup, modeSlug, ruleset, seed, ...extra] = id.split("__");
+
+  if (!matchup || !modeSlug || !ruleset || !seed || extra.length) {
+    return null;
+  }
+
+  const [teamAId, teamBId, ...matchupExtra] = matchup.split("-vs-");
+
+  if (!teamAId || !teamBId || matchupExtra.length) {
+    return null;
+  }
+
+  const parsed = simulateRequestSchema.safeParse({
+    teamAId,
+    teamBId,
+    mode: modeSlug === "game" ? "single_game" : modeSlug === "series" ? "best_of_7" : modeSlug,
+    ruleset,
+    seed,
+  });
+
+  if (!parsed.success || parsed.data.teamAId === parsed.data.teamBId || !parsed.data.seed) {
+    return null;
+  }
+
+  return buildDecodedSimulation(id, { ...parsed.data, seed: parsed.data.seed });
+}
+
+function buildDecodedSimulation(
+  id: string,
+  parsed: {
+    teamAId: string;
+    teamBId: string;
+    mode: "single_game" | "best_of_7";
+    ruleset: "modern" | "physical_90s" | "early_2000s" | "bubble" | "neutral";
+    seed: string;
+  },
+) {
+  const pair = getTeamPair(parsed.teamAId, parsed.teamBId);
+  if (!pair) {
+    return null;
+  }
+
+  const result =
+    parsed.mode === "single_game"
+      ? simulateGame({ ...pair, ruleset: parsed.ruleset, seed: parsed.seed })
+      : simulateSeries({ ...pair, ruleset: parsed.ruleset, seed: parsed.seed });
+
+  return {
+    id,
+    teamAId: parsed.teamAId,
+    teamBId: parsed.teamBId,
+    mode: parsed.mode,
+    ruleset: parsed.ruleset,
+    seed: parsed.seed,
+    result,
+    createdAt: new Date(0).toISOString(),
+  };
 }

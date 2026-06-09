@@ -1,13 +1,49 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BoxScoreTable } from "@/components/BoxScoreTable";
 import { MatchupFactors } from "@/components/MatchupFactors";
 import { MvpCard } from "@/components/MvpCard";
 import { Scoreboard } from "@/components/Scoreboard";
 import { SeriesSummary } from "@/components/SeriesSummary";
+import { ShareResult } from "@/components/ShareResult";
 import { TeamRadarChart } from "@/components/TeamRadarChart";
+import { buildShareSummary } from "@/lib/shareSummary";
 import { getSimulation } from "@/lib/simulationStore";
 
-export default async function ResultPage({ params }: { params: Promise<{ id: string }> }) {
+type ResultPageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export async function generateMetadata({ params }: ResultPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const simulation = await getSimulation(id);
+
+  if (!simulation) {
+    return {
+      title: "Timeout Result",
+      description: "Simulate the NBA matchups time never gave us.",
+    };
+  }
+
+  const summary = buildShareSummary(simulation.result);
+
+  return {
+    title: summary.title,
+    description: summary.description,
+    openGraph: {
+      title: summary.title,
+      description: summary.description,
+      type: "website",
+    },
+    twitter: {
+      card: "summary",
+      title: summary.title,
+      description: summary.description,
+    },
+  };
+}
+
+export default async function ResultPage({ params }: ResultPageProps) {
   const { id } = await params;
   const simulation = await getSimulation(id);
 
@@ -22,7 +58,8 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
     <main>
       <Scoreboard result={result} />
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid gap-5 lg:grid-cols-[340px_1fr] lg:items-stretch">
+        <ShareResult result={result} />
+        <div className="mt-5 grid gap-5 lg:grid-cols-[340px_1fr] lg:items-stretch">
           <div className="flex h-full flex-col justify-between gap-5">
             <MvpCard mvp={result.mvp} />
             <MatchupFactors factors={result.matchupFactors} teams={[result.teamA, result.teamB]} />
