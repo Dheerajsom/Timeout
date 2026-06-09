@@ -3,16 +3,24 @@
 import { useEffect, useState } from "react";
 import { Check, Share2 } from "lucide-react";
 
-export function ShareButton({ simulationId, className }: { simulationId: string; className?: string }) {
+export function ShareButton({
+  simulationId,
+  shareOrigin,
+  className,
+}: {
+  simulationId: string;
+  shareOrigin?: string;
+  className?: string;
+}) {
   const [shareUrl, setShareUrl] = useState("");
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
 
   useEffect(() => {
     const configuredOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "");
-    const origin = configuredOrigin || window.location.origin;
+    const origin = shareOrigin || configuredOrigin || window.location.origin;
     setShareUrl(new URL(`/share/${simulationId}`, origin).toString());
-  }, [simulationId]);
+  }, [shareOrigin, simulationId]);
 
   async function copyShareUrl() {
     if (!shareUrl) {

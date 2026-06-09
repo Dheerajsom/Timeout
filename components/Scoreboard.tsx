@@ -6,7 +6,15 @@ import { getTeamColors } from "@/lib/teamColors";
 import { RulesetBadge } from "./RulesetBadge";
 import { ShareButton } from "./ShareButton";
 
-export function Scoreboard({ result, simulationId }: { result: SimulatedGame | SimulatedSeries; simulationId: string }) {
+export function Scoreboard({
+  result,
+  shareOrigin,
+  simulationId,
+}: {
+  result: SimulatedGame | SimulatedSeries;
+  shareOrigin: string;
+  simulationId: string;
+}) {
   const game = result.type === "single_game" ? result : result.decidingGame;
   const winnerId = result.winnerTeamId;
   const actionClassName =
@@ -31,7 +39,7 @@ export function Scoreboard({ result, simulationId }: { result: SimulatedGame | S
             <div className="grid place-items-center rounded border border-white/15 bg-neutral-900 px-5 text-sm font-black uppercase tracking-[0.28em] text-neutral-100">
               Final
             </div>
-            <ShareButton simulationId={simulationId} className={actionClassName} />
+            <ShareButton simulationId={simulationId} shareOrigin={shareOrigin} className={actionClassName} />
             <Link
               href={`/?teamA=${result.teamA.id}&teamB=${result.teamB.id}`}
               className={runItBackClassName}
@@ -43,7 +51,7 @@ export function Scoreboard({ result, simulationId }: { result: SimulatedGame | S
           <ScoreTeam team={result.teamB} score={game.teamBScore} isWinner={winnerId === result.teamB.id} align="right" />
         </div>
         <div className="mt-3 grid gap-2 sm:grid-cols-2 md:hidden">
-          <ShareButton simulationId={simulationId} className={`${actionClassName} w-full`} />
+          <ShareButton simulationId={simulationId} shareOrigin={shareOrigin} className={`${actionClassName} w-full`} />
           <Link
             href={`/?teamA=${result.teamA.id}&teamB=${result.teamB.id}`}
             className={`${runItBackClassName} w-full`}

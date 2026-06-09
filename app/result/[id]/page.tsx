@@ -69,10 +69,11 @@ export default async function ResultPage({ params }: ResultPageProps) {
 
   const result = simulation.result;
   const game = result.type === "single_game" ? result : result.decidingGame;
+  const shareOrigin = getSiteOrigin();
 
   return (
     <main>
-      <Scoreboard result={result} simulationId={id} />
+      <Scoreboard result={result} shareOrigin={shareOrigin} simulationId={id} />
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-[340px_1fr] lg:items-stretch">
           <div className="flex h-full flex-col justify-between gap-5">
