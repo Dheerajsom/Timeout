@@ -43,28 +43,30 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   const userWon = result.winnerTeamId === userTeam.id;
   const winner = result.winnerTeamId === userTeam.id ? userTeam : opponent;
   const loser = result.winnerTeamId === userTeam.id ? opponent : userTeam;
-  const colors = getTeamColors(userTeam);
+  const colors = getTeamColors(winner);
   const winnerLabel = `${winner.season} ${winner.franchise}`;
   const loserLabel = `${loser.season} ${loser.franchise}`;
   const userTeamLabel = `${userTeam.season} ${userTeam.franchise}`;
   const opponentLabel = `${opponent.season} ${opponent.franchise}`;
-  const scoreLabel = `${game.teamAScore}-${game.teamBScore}`;
+  const winnerScore = result.winnerTeamId === result.teamA.id ? game.teamAScore : game.teamBScore;
+  const loserScore = result.winnerTeamId === result.teamA.id ? game.teamBScore : game.teamAScore;
+  const scoreLabel = `${winnerScore}-${loserScore}`;
 
   return new ImageResponse(
     (
       <div
         style={{
-          background: "#111111",
+          background: "#0b0b0c",
           color: "white",
           display: "flex",
           height: "100%",
-          padding: 44,
+          padding: 38,
           width: "100%",
         }}
       >
         <div
           style={{
-            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primary} 53%, #101010 53%, #101010 100%)`,
+            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primary} 48%, ${colors.secondary} 48%, #111111 68%, #0d0d0e 100%)`,
             border: "4px solid rgba(255,255,255,0.24)",
             borderRadius: 18,
             boxShadow: "0 36px 100px rgba(0,0,0,0.48)",
@@ -73,7 +75,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             height: "100%",
             justifyContent: "space-between",
             overflow: "hidden",
-            padding: 36,
+            padding: 34,
             position: "relative",
             width: "100%",
           }}
@@ -88,15 +90,15 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           />
           <div
             style={{
-              background: "linear-gradient(90deg, rgba(0,0,0,0.38), rgba(0,0,0,0.08) 48%, rgba(0,0,0,0.42))",
+              background: "linear-gradient(90deg, rgba(0,0,0,0.28), rgba(0,0,0,0.08) 42%, rgba(0,0,0,0.54))",
               display: "flex",
               inset: 0,
               position: "absolute",
             }}
           />
 
-          <div style={{ display: "flex", gap: 30, height: 322, position: "relative", width: "100%" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 20, flex: 1 }}>
+          <div style={{ display: "flex", gap: 28, height: 318, position: "relative", width: "100%" }}>
+            <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "space-between", minWidth: 0 }}>
               <div
                 style={{
                   border: "2px solid rgba(255,255,255,0.22)",
@@ -114,15 +116,31 @@ export default async function Image({ params }: { params: Promise<{ id: string }
                 Timeout Result
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 720 }}>
-                <div style={{ display: "flex", fontSize: 58, fontWeight: 900, lineHeight: 0.92 }}>
-                  {winnerLabel}
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, width: 735 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <div style={{ color: "rgba(255,255,255,0.72)", display: "flex", fontSize: 23, fontWeight: 900, letterSpacing: 4, textTransform: "uppercase" }}>
+                    Winner
+                  </div>
+                  <div style={{ display: "flex", fontSize: 52, fontWeight: 900, lineHeight: 0.98 }}>
+                    {winnerLabel}
+                  </div>
                 </div>
-                <div style={{ color: "rgba(255,255,255,0.78)", display: "flex", fontSize: 26, fontWeight: 900, letterSpacing: 3, textTransform: "uppercase" }}>
-                  beat
+
+                <div style={{ alignItems: "center", display: "flex", gap: 18 }}>
+                  <div style={{ background: "rgba(255,255,255,0.58)", display: "flex", height: 2, width: 64 }} />
+                  <div style={{ color: "rgba(255,255,255,0.86)", display: "flex", fontSize: 24, fontWeight: 900, letterSpacing: 4, textTransform: "uppercase" }}>
+                    beat
+                  </div>
+                  <div style={{ background: "rgba(255,255,255,0.58)", display: "flex", flex: 1, height: 2 }} />
                 </div>
-                <div style={{ display: "flex", fontSize: 45, fontWeight: 900, lineHeight: 0.96 }}>
-                  {loserLabel}
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <div style={{ color: "rgba(255,255,255,0.72)", display: "flex", fontSize: 21, fontWeight: 900, letterSpacing: 4, textTransform: "uppercase" }}>
+                    Opponent
+                  </div>
+                  <div style={{ display: "flex", fontSize: 42, fontWeight: 900, lineHeight: 1 }}>
+                    {loserLabel}
+                  </div>
                 </div>
               </div>
             </div>
@@ -136,10 +154,10 @@ export default async function Image({ params }: { params: Promise<{ id: string }
                 color: "#111111",
                 display: "flex",
                 flexDirection: "column",
-                height: 118,
+                height: 124,
                 justifyContent: "center",
                 padding: "0 30px",
-                width: 244,
+                width: 250,
               }}
             >
               <div style={{ color: "#555555", display: "flex", fontSize: 18, fontWeight: 900, letterSpacing: 3, textTransform: "uppercase" }}>
@@ -151,7 +169,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             </div>
           </div>
 
-          <div style={{ alignItems: "stretch", display: "flex", gap: 22, height: 158, position: "relative", width: "100%" }}>
+          <div style={{ alignItems: "stretch", display: "flex", gap: 22, height: 166, position: "relative", width: "100%" }}>
             <div
               style={{
                 background: "rgba(0,0,0,0.42)",
@@ -161,17 +179,19 @@ export default async function Image({ params }: { params: Promise<{ id: string }
                 display: "flex",
                 flexDirection: "column",
                 flex: 1,
-                gap: 8,
-                padding: "20px 26px",
+                justifyContent: "space-between",
+                padding: "20px 28px",
               }}
             >
-              <div style={{ color: "#fed7aa", display: "flex", fontSize: 20, fontWeight: 900, letterSpacing: 4, textTransform: "uppercase" }}>
-                MVP
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ color: "#fed7aa", display: "flex", fontSize: 20, fontWeight: 900, letterSpacing: 4, textTransform: "uppercase" }}>
+                  MVP
+                </div>
+                <div style={{ display: "flex", fontSize: 34, fontWeight: 900, lineHeight: 1.02 }}>
+                  {result.mvp.name}
+                </div>
               </div>
-              <div style={{ display: "flex", fontSize: 32, fontWeight: 900, lineHeight: 1 }}>
-                {result.mvp.name}
-              </div>
-              <div style={{ display: "flex", gap: 12 }}>
+              <div style={{ display: "flex", gap: 12, width: "100%" }}>
                 <OgStat label="PTS" value={result.mvp.points} />
                 <OgStat label="REB" value={result.mvp.rebounds} />
                 <OgStat label="AST" value={result.mvp.assists} />
@@ -185,13 +205,12 @@ export default async function Image({ params }: { params: Promise<{ id: string }
                 borderRadius: 16,
                 display: "flex",
                 flexDirection: "column",
-                gap: 16,
-                justifyContent: "center",
-                padding: "20px 26px",
-                width: 430,
+                justifyContent: "space-between",
+                padding: "20px 28px",
+                width: 472,
               }}
             >
-              <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ alignItems: "center", display: "flex", gap: 14 }}>
                   <div style={{ color: "#fed7aa", display: "flex", fontSize: 18, fontWeight: 900, letterSpacing: 4, textTransform: "uppercase" }}>
                     My pick
@@ -212,16 +231,16 @@ export default async function Image({ params }: { params: Promise<{ id: string }
                     {userWon ? "Won" : "Lost"}
                   </div>
                 </div>
-                <div style={{ display: "flex", fontSize: 27, fontWeight: 900, lineHeight: 1.05 }}>
+                <div style={{ display: "flex", fontSize: 26, fontWeight: 900, lineHeight: 1.04 }}>
                   {userTeamLabel}
                 </div>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ color: "#fed7aa", display: "flex", fontSize: 18, fontWeight: 900, letterSpacing: 4, textTransform: "uppercase" }}>
                   Opponent
                 </div>
-                <div style={{ display: "flex", fontSize: 27, fontWeight: 900, lineHeight: 1.05 }}>
+                <div style={{ display: "flex", fontSize: 26, fontWeight: 900, lineHeight: 1.04 }}>
                   {opponentLabel}
                 </div>
               </div>
@@ -244,9 +263,9 @@ function OgStat({ label, value }: { label: string; value: number }) {
         borderRadius: 12,
         display: "flex",
         flexDirection: "column",
-        height: 58,
+        flex: 1,
+        height: 60,
         justifyContent: "center",
-        width: 88,
       }}
     >
       <div style={{ display: "flex", fontSize: 25, fontWeight: 900 }}>{value}</div>
