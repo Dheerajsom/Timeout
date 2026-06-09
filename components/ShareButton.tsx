@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Check, Share2 } from "lucide-react";
+import { PUBLIC_SITE_ORIGIN } from "@/lib/siteUrl";
 
 export function ShareButton({
   simulationId,
@@ -18,7 +19,8 @@ export function ShareButton({
 
   useEffect(() => {
     const configuredOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "");
-    const origin = shareOrigin || configuredOrigin || window.location.origin;
+    const fallbackOrigin = process.env.NODE_ENV === "development" ? window.location.origin : PUBLIC_SITE_ORIGIN;
+    const origin = shareOrigin || configuredOrigin || fallbackOrigin;
     setShareUrl(new URL(`/share/${simulationId}`, origin).toString());
   }, [shareOrigin, simulationId]);
 
