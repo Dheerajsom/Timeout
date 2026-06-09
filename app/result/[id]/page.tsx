@@ -5,7 +5,6 @@ import { MatchupFactors } from "@/components/MatchupFactors";
 import { MvpCard } from "@/components/MvpCard";
 import { Scoreboard } from "@/components/Scoreboard";
 import { SeriesSummary } from "@/components/SeriesSummary";
-import { ShareResult } from "@/components/ShareResult";
 import { TeamRadarChart } from "@/components/TeamRadarChart";
 import { buildShareSummary } from "@/lib/shareSummary";
 import { getSimulation } from "@/lib/simulationStore";
@@ -56,10 +55,9 @@ export default async function ResultPage({ params }: ResultPageProps) {
 
   return (
     <main>
-      <Scoreboard result={result} />
+      <Scoreboard result={result} simulationId={id} />
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <ShareResult result={result} />
-        <div className="mt-5 grid gap-5 lg:grid-cols-[340px_1fr] lg:items-stretch">
+        <div className="grid gap-5 lg:grid-cols-[340px_1fr] lg:items-stretch">
           <div className="flex h-full flex-col justify-between gap-5">
             <MvpCard mvp={result.mvp} />
             <MatchupFactors factors={result.matchupFactors} teams={[result.teamA, result.teamB]} />
