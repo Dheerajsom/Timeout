@@ -120,10 +120,17 @@ input {
 }
 
 .wheel-spin {
+  --wheel-target-offset: 37px;
   animation: wheelSpin var(--wheel-duration, 5s) cubic-bezier(0.08, 0.72, 0.12, 1) both;
   backface-visibility: hidden;
   transform: translate3d(0, 0, 0);
   will-change: transform, filter;
+}
+
+@media (min-width: 640px) {
+  .wheel-spin {
+    --wheel-target-offset: 62px;
+  }
 }
 
 .team-card {
@@ -249,17 +256,17 @@ input {
   }
 
   90% {
-    transform: translate3d(0, calc((var(--wheel-distance, 1200px) * -1) - 22px), 0);
+    transform: translate3d(0, calc(var(--wheel-target-offset, 62px) - var(--wheel-distance-base, 1200px) - 22px), 0);
     filter: blur(0.2px);
   }
 
   96% {
-    transform: translate3d(0, calc((var(--wheel-distance, 1200px) * -1) + 8px), 0);
+    transform: translate3d(0, calc(var(--wheel-target-offset, 62px) - var(--wheel-distance-base, 1200px) + 8px), 0);
     filter: blur(0);
   }
 
   100% {
-    transform: translate3d(0, calc(var(--wheel-distance, 1200px) * -1), 0);
+    transform: translate3d(0, calc(var(--wheel-target-offset, 62px) - var(--wheel-distance-base, 1200px)), 0);
     filter: blur(0);
   }
 }

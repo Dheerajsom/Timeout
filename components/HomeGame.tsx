@@ -11,7 +11,6 @@ import type { SimulatedGame, SimulatedSeries, Team } from "@/types/simulation";
 const activeRuleset = "modern";
 const spinDuration = 5000;
 const itemPitch = 94;
-const targetOffset = 62;
 const historyStorageKey = "timeout-round-history";
 const historyLimit = 30;
 
@@ -398,7 +397,7 @@ function ReelColumn({ wheel, index }: { wheel: WheelState; index: number }) {
         className="wheel-spin reel-window space-y-3 p-3"
         style={
           {
-            "--wheel-distance": `${Math.max(wheel.targetIndex * itemPitch - targetOffset, 0)}px`,
+            "--wheel-distance-base": `${wheel.targetIndex * itemPitch}px`,
             "--wheel-duration": `${4.8 + index * 0.16}s`,
           } as CSSProperties
         }
