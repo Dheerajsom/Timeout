@@ -74,7 +74,7 @@ export default async function SharePage({ params }: SharePageProps) {
   const userScore = game.teamAScore;
   const opponentScore = game.teamBScore;
   const winner = result.winnerTeamId === userTeam.id ? userTeam : opponent;
-  const colors = getTeamColors(userTeam);
+  const colors = getTeamColors(winner);
   const style = {
     "--share-primary": colors.primary,
     "--share-secondary": colors.secondary,
@@ -156,8 +156,7 @@ export default async function SharePage({ params }: SharePageProps) {
             </div>
           </div>
 
-          <div className="relative bg-black/30 p-4">
-            <div className="mb-4 h-px w-full max-w-sm bg-white/12" aria-hidden="true" />
+          <div className="relative bg-black/30 px-5 pb-5 sm:px-6 sm:pb-6">
             <div className="flex justify-start">
               <Link
                 href={`/result/${id}`}
