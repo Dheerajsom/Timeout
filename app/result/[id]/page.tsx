@@ -75,18 +75,18 @@ export default async function ResultPage({ params }: ResultPageProps) {
     <main>
       <Scoreboard result={result} shareOrigin={shareOrigin} simulationId={id} />
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid gap-5 lg:grid-cols-[340px_1fr] lg:items-stretch">
-          <div className="flex h-full flex-col justify-between gap-5">
+        <div className="grid min-w-0 gap-5 lg:grid-cols-[340px_1fr] lg:items-stretch">
+          <div className="flex h-full min-w-0 flex-col justify-between gap-5">
             <MvpCard mvp={result.mvp} />
             <MatchupFactors factors={result.matchupFactors} teams={[result.teamA, result.teamB]} />
           </div>
-          <div className="space-y-5">
+          <div className="min-w-0 space-y-5">
             <BoxScoreTable team={result.teamA} players={game.teamABoxScore} />
             <BoxScoreTable team={result.teamB} players={game.teamBBoxScore} />
           </div>
         </div>
 
-        <div className="mt-3 space-y-5">
+        <div className="mt-3 min-w-0 space-y-5">
           {result.type === "best_of_7" ? <SeriesSummary series={result} /> : null}
           <TeamRadarChart teamA={result.teamA} teamB={result.teamB} />
         </div>

@@ -23,8 +23,8 @@ export function Scoreboard({
 
   return (
     <section className="bg-neutral-950">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-5 flex flex-wrap items-center gap-3 text-neutral-100">
+      <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mb-4 flex flex-wrap items-center gap-2 text-neutral-100 sm:mb-5 sm:gap-3">
           <RulesetBadge ruleset={result.ruleset} />
           <span className="rounded border border-white/15 bg-neutral-900 px-2 py-1 text-xs font-semibold text-neutral-100">
             Seed {result.seed}
@@ -60,7 +60,7 @@ export function Scoreboard({
             Run It Back
           </Link>
         </div>
-        <div className="mx-auto mt-7 h-px w-full max-w-4xl bg-white/[0.08]" aria-hidden="true" />
+        <div className="mx-auto mt-5 h-px w-full max-w-4xl bg-white/[0.08] sm:mt-7" aria-hidden="true" />
       </div>
     </section>
   );
@@ -87,7 +87,7 @@ function ScoreTeam({
   return (
     <div
       style={style}
-      className={`relative overflow-hidden rounded-md border p-5 ${
+      className={`relative overflow-hidden rounded-md border p-4 sm:p-5 ${
         isWinner ? "border-white/30 shadow-[0_18px_48px_rgba(0,0,0,0.35)]" : "border-white/10 opacity-[0.88]"
       } ${align === "right" ? "text-left md:text-right" : "text-left"}`}
     >
@@ -102,12 +102,12 @@ function ScoreTeam({
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.14),transparent_34%),linear-gradient(90deg,rgba(0,0,0,0.26),transparent_54%)]" aria-hidden="true" />
       <div className="relative flex items-start justify-between gap-4 md:block">
         <div>
-          <div className="text-sm font-black uppercase tracking-[0.18em] text-white/90">{team.season}</div>
-          <div className={`mt-1 text-2xl ${isWinner ? "font-black" : "font-semibold"} text-white sm:text-3xl`}>
+          <div className="text-xs font-black uppercase tracking-[0.18em] text-white/90 sm:text-sm">{team.season}</div>
+          <div className={`mt-1 text-xl ${isWinner ? "font-black" : "font-semibold"} text-white sm:text-3xl`}>
             {team.franchise}
           </div>
         </div>
-        <div className={`text-6xl font-black tracking-normal text-white sm:text-7xl ${isWinner ? "drop-shadow-[0_3px_0_rgba(0,0,0,0.35)]" : ""}`}>
+        <div className={`text-5xl font-black tracking-normal text-white sm:text-7xl ${isWinner ? "drop-shadow-[0_3px_0_rgba(0,0,0,0.35)]" : ""}`}>
           {score}
         </div>
       </div>

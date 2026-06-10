@@ -11,7 +11,7 @@ export function BoxScoreTable({ team, players }: { team: Team; players: PlayerBo
   } as CSSProperties;
 
   return (
-    <div style={style} className="overflow-hidden rounded-md border border-orange-100/18 bg-[#15100b] shadow-[0_18px_48px_rgba(36,20,8,0.34)]">
+    <div style={style} className="min-w-0 overflow-hidden rounded-md border border-orange-100/18 bg-[#15100b] shadow-[0_18px_48px_rgba(36,20,8,0.34)]">
       <div className="h-1.5 bg-[linear-gradient(90deg,var(--box-primary),var(--box-secondary))]" aria-hidden="true" />
       <div className="border-b border-orange-100/14 bg-[#21170f] px-4 py-3">
         <h3 className="text-sm font-black text-white">

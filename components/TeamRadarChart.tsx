@@ -26,7 +26,7 @@ export function TeamRadarChart({ teamA, teamB }: { teamA: Team; teamB: Team }) {
   }));
 
   return (
-    <div className="overflow-x-auto rounded-md border border-white/12 bg-neutral-950 px-4 py-3">
+    <div className="min-w-0 overflow-x-auto rounded-md border border-white/12 bg-neutral-950 px-4 py-3">
       <div className="mx-auto w-[640px] max-w-full">
         <RadarChart width={640} height={320} data={data}>
           <PolarGrid stroke="rgba(255,255,255,0.14)" />

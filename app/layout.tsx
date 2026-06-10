@@ -30,9 +30,9 @@ export default function RootLayout({
         <CourtBackground />
         <div className="min-h-screen">
           <header className="relative z-50">
-            <div className="mx-auto flex max-w-7xl items-center justify-center px-4 pb-2 pt-4 sm:px-6 sm:pt-5 lg:px-8">
+            <div className="mx-auto flex max-w-7xl items-center justify-center px-4 pb-1 pt-3 sm:px-6 sm:pb-2 sm:pt-5 lg:px-8">
               <Link href="/" className="group flex flex-col items-center gap-0">
-                <span className="relative block h-28 w-28 transition duration-200 group-hover:scale-105 sm:h-32 sm:w-32">
+                <span className="relative block h-20 w-20 transition duration-200 group-hover:scale-105 sm:h-32 sm:w-32">
                   <Image
                     src="/timeout-logo-mark.png"
                     alt="Timeout"
@@ -43,10 +43,10 @@ export default function RootLayout({
                   />
                 </span>
                 <span className="-mt-2 text-center">
-                  <span className="brand-title block text-2xl font-black uppercase tracking-normal sm:text-3xl">
+                  <span className="brand-title block text-xl font-black uppercase tracking-normal sm:text-3xl">
                     Timeout
                   </span>
-                  <span className="block text-[11px] font-black uppercase tracking-[0.22em] text-orange-100 drop-shadow-[0_2px_0_rgba(124,45,18,0.95)]">
+                  <span className="block text-[10px] font-black uppercase tracking-[0.22em] text-orange-100 drop-shadow-[0_2px_0_rgba(124,45,18,0.95)] sm:text-[11px]">
                     Est. 2026
                   </span>
                 </span>
@@ -56,7 +56,7 @@ export default function RootLayout({
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Open Timeout on GitHub"
-                className="absolute right-4 top-4 inline-flex h-11 items-center justify-center gap-2 rounded-md border border-white/20 bg-neutral-950 px-3 text-xs font-black uppercase tracking-normal text-white shadow-[0_14px_36px_rgba(0,0,0,0.28)] transition hover:border-orange-300 hover:bg-orange-500 sm:right-6 sm:px-4 lg:right-8"
+                className="absolute right-4 top-3 inline-flex h-10 items-center justify-center gap-2 rounded-md border border-white/20 bg-neutral-950 px-3 text-xs font-black uppercase tracking-normal text-white shadow-[0_14px_36px_rgba(0,0,0,0.28)] transition hover:border-orange-300 hover:bg-orange-500 sm:right-6 sm:top-4 sm:h-11 sm:px-4 lg:right-8"
               >
                 <Code2 className="h-4 w-4" aria-hidden="true" />
                 <span className="hidden sm:inline">GitHub</span>
@@ -64,7 +64,7 @@ export default function RootLayout({
             </div>
           </header>
           {children}
-          <footer className="relative z-40 px-4 pb-6 text-center text-xs font-bold uppercase tracking-[0.14em] text-white/85 drop-shadow-[0_2px_0_rgba(0,0,0,0.65)] sm:px-6 lg:px-8">
+          <footer className="relative z-40 px-4 pb-10 text-center text-xs font-bold uppercase tracking-[0.14em] text-white/85 drop-shadow-[0_2px_0_rgba(0,0,0,0.65)] sm:px-6 sm:pb-6 lg:px-8">
             Timeout is an independent project and not affiliated with the NBA.
           </footer>
         </div>

@@ -118,7 +118,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden px-4 pb-8 pt-2 sm:px-6 sm:pt-4 lg:px-8">
+    <main className="relative min-h-screen overflow-hidden px-4 pb-10 pt-1 sm:px-6 sm:pb-8 sm:pt-4 lg:px-8">
       <div className="absolute inset-0 halftone opacity-[0.045]" aria-hidden="true" />
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-black/26 via-black/8 to-transparent"
@@ -126,10 +126,10 @@ export function HomeGame({ teams }: { teams: Team[] }) {
       />
 
       <section className="relative mx-auto max-w-5xl text-center">
-        <h1 className="hero-title text-3xl font-black tracking-normal sm:text-4xl">
+        <h1 className="hero-title text-[2rem] font-black leading-tight tracking-normal sm:text-4xl">
           Matchups time never gave us.
         </h1>
-        <p className="mx-auto mt-3 max-w-xl text-base font-semibold leading-7 text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.55)]">
+        <p className="mx-auto mt-2 max-w-xl text-base font-semibold leading-7 text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.55)] sm:mt-3">
           A challenger appears. Spin three mystery squads and pick the one built to win.
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
@@ -153,10 +153,10 @@ export function HomeGame({ teams }: { teams: Team[] }) {
         </div>
       </section>
 
-      <section className="relative mx-auto mt-7 grid max-w-7xl items-stretch gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
-        <div className="h-full rounded-md border border-white/18 bg-neutral-950 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
-          <div className="mb-5 text-center">
-            <h2 className="panel-title text-3xl font-black text-white">Pick your squad</h2>
+      <section className="relative mx-auto mt-5 grid max-w-7xl items-stretch gap-4 sm:mt-7 sm:gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
+        <div className="h-full rounded-md border border-white/18 bg-neutral-950 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:p-5">
+          <div className="mb-4 text-center sm:mb-5">
+            <h2 className="panel-title text-2xl font-black text-white sm:text-3xl">Pick your squad</h2>
           </div>
 
           {isSpinning ? (
@@ -208,7 +208,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
           </div>
         </div>
 
-        <aside className="flex h-full flex-col overflow-hidden rounded-md border border-white/18 bg-neutral-950 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+        <aside className="flex h-full flex-col overflow-hidden rounded-md border border-white/18 bg-neutral-950 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-5">
           {enemy ? <OpponentHeader team={enemy} /> : null}
           {enemy ? <TeamCard team={enemy} opponent /> : <EmptyPanel label="New Round sets the matchup." />}
           {error ? <p className="mt-3 text-sm text-orange-300">{error}</p> : null}
@@ -376,11 +376,11 @@ function TeamCard({
             : "border-slate-700"
       }`}
     >
-      <div className="flex h-full min-h-[170px] flex-col justify-between">
+      <div className="flex h-full min-h-[130px] flex-col justify-between sm:min-h-[170px]">
         <TeamMark team={team} />
         <div>
           <div className="text-xs font-black uppercase tracking-[0.16em] text-white/85">{team.season}</div>
-          <div className="mt-2 text-2xl font-black leading-7 text-white">{team.franchise}</div>
+          <div className="mt-2 text-xl font-black leading-6 text-white sm:text-2xl sm:leading-7">{team.franchise}</div>
         </div>
       </div>
     </div>
@@ -389,7 +389,7 @@ function TeamCard({
 
 function ReelColumn({ wheel, index }: { wheel: WheelState; index: number }) {
   return (
-    <div className="relative h-[230px] overflow-hidden rounded-md border border-slate-700 bg-neutral-950">
+    <div className="relative h-[180px] overflow-hidden rounded-md border border-slate-700 bg-neutral-950 sm:h-[230px]">
       <div className="wheel-arrow" aria-hidden="true">
         <span />
       </div>
@@ -433,7 +433,7 @@ function OpponentHeader({ team }: { team: Team }) {
   return (
     <div className="mb-5 text-center">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-orange-200">Can you beat the...</div>
-      <h2 className="panel-title mt-2 text-3xl font-black leading-8 text-white">{team.franchise}</h2>
+      <h2 className="panel-title mt-2 text-2xl font-black leading-7 text-white sm:text-3xl sm:leading-8">{team.franchise}</h2>
     </div>
   );
 }
@@ -450,7 +450,7 @@ function TeamMark({ team }: { team: Team }) {
 
 function IdleSlot({ index }: { index: number }) {
   return (
-    <div className="slot-idle grid h-[230px] place-items-center rounded-md border border-slate-700 bg-slate-950 p-5 text-center">
+    <div className="slot-idle grid h-[180px] place-items-center rounded-md border border-slate-700 bg-slate-950 p-5 text-center sm:h-[230px]">
       <div>
         <div className="mx-auto grid h-14 w-14 place-items-center rounded-full border border-white/15 bg-white/8 text-2xl font-black text-white/85">
           {index + 1}
@@ -463,7 +463,7 @@ function IdleSlot({ index }: { index: number }) {
 
 function EmptyPanel({ label }: { label: string }) {
   return (
-    <div className="grid min-h-[260px] place-items-center rounded-md border border-dashed border-slate-700 bg-neutral-900 p-6 text-center text-sm text-neutral-300">
+    <div className="grid min-h-[190px] place-items-center rounded-md border border-dashed border-slate-700 bg-neutral-900 p-6 text-center text-sm text-neutral-300 sm:min-h-[260px]">
       {label}
     </div>
   );
