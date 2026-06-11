@@ -10,7 +10,10 @@ import type { SimulatedGame, SimulatedSeries, Team } from "@/types/simulation";
 
 const activeRuleset = "modern";
 const spinDuration = 5000;
-const itemPitch = 94;
+const mobileItemPitch = 176;
+const mobileDistanceAdjustment = 4;
+const desktopItemPitch = 94;
+const desktopTargetOffset = 62;
 const historyStorageKey = "timeout-round-history";
 const historyLimit = 30;
 
@@ -392,12 +395,13 @@ function ReelColumn({ wheel, index }: { wheel: WheelState; index: number }) {
       <div className="wheel-arrow" aria-hidden="true">
         <span />
       </div>
-      <div className="pointer-events-none absolute inset-x-3 top-1/2 z-10 h-[86px] -translate-y-1/2 rounded-md ring-2 ring-white/20 shadow-[0_0_26px_rgba(255,255,255,0.08)]" />
+      <div className="pointer-events-none absolute inset-x-3 top-1/2 z-10 h-[168px] -translate-y-1/2 rounded-md ring-2 ring-white/20 shadow-[0_0_26px_rgba(255,255,255,0.08)] sm:h-[86px]" />
       <div
         className="wheel-spin reel-window space-y-3 p-3"
         style={
           {
-            "--wheel-distance-base": `${wheel.targetIndex * itemPitch}px`,
+            "--wheel-distance-mobile": `${wheel.targetIndex * mobileItemPitch + mobileDistanceAdjustment}px`,
+            "--wheel-distance-desktop": `${Math.max(wheel.targetIndex * desktopItemPitch - desktopTargetOffset, 0)}px`,
             "--wheel-duration": `${4.8 + index * 0.16}s`,
           } as CSSProperties
         }
@@ -414,7 +418,7 @@ function WheelTeam({ team }: { team: Team }) {
   const colors = getTeamColors(team);
   return (
     <div
-      className="flex h-[82px] items-center rounded-md border border-white/15 px-3 shadow-[0_10px_24px_rgba(0,0,0,0.18)]"
+      className="flex h-[164px] items-center rounded-md border border-white/15 px-3 shadow-[0_10px_24px_rgba(0,0,0,0.18)] sm:h-[82px]"
       style={{
         background: `linear-gradient(135deg, ${colors.primary} 0 52%, ${colors.secondary} 52% 100%)`,
         boxShadow: `inset 5px 0 0 ${colors.accent}, 0 10px 24px rgba(0,0,0,0.18)`,
