@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight, Dices, History, Loader2, X } from "lucide-react";
+import { ChevronRight, Dices, History, Loader2, Search, X } from "lucide-react";
 import { getTeamColors } from "@/lib/teamColors";
 import type { SimulatedGame, SimulatedSeries, Team } from "@/types/simulation";
 
@@ -45,12 +45,25 @@ export function HomeGame({ teams }: { teams: Team[] }) {
   const [wheels, setWheels] = useState<WheelState[]>([]);
   const [enemy, setEnemy] = useState<Team | null>(null);
   const [selectedId, setSelectedId] = useState("");
+  const [manualSelectedId, setManualSelectedId] = useState("");
+  const [manualSearch, setManualSearch] = useState("");
   const [isSimulating, setIsSimulating] = useState(false);
-  const [error, setError] = useState("");
+  const [spinError, setSpinError] = useState("");
+  const [manualError, setManualError] = useState("");
   const [history, setHistory] = useState<RoundHistoryEntry[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const selected = choices.find((team) => team.id === selectedId) ?? null;
+  const manualSelected = teams.find((team) => team.id === manualSelectedId) ?? null;
+  const manualSearchResults = useMemo(() => {
+    const query = manualSearch.trim().toLowerCase();
+
+    if (!query) {
+      return teams;
+    }
+
+    return teams.filter((team) => `${team.season} ${team.franchise}`.toLowerCase().includes(query));
+  }, [manualSearch, teams]);
   const fallbackWheels = useMemo(
     () => [buildPreviewWheel(teams), buildPreviewWheel(teams), buildPreviewWheel(teams)],
     [teams],
@@ -63,9 +76,11 @@ export function HomeGame({ teams }: { teams: Team[] }) {
   }, []);
 
   function startNewRound() {
-    setError("");
+    setSpinError("");
+    setManualError("");
     setIsSpinning(false);
     setSelectedId("");
+    setManualSelectedId("");
     setChoices([]);
     setWheels([buildPreviewWheel(teams), buildPreviewWheel(teams), buildPreviewWheel(teams)]);
     setEnemy(drawTeams(teams, 1)[0]);
@@ -76,7 +91,8 @@ export function HomeGame({ teams }: { teams: Team[] }) {
     const nextChoices = drawTeams(pool, 3);
     const nextWheels = nextChoices.map((choice, index) => buildWheelForTarget(pool, choice, index));
 
-    setError("");
+    setSpinError("");
+    setManualError("");
     setSelectedId("");
     setChoices([]);
     setWheels(nextWheels);
@@ -90,18 +106,37 @@ export function HomeGame({ teams }: { teams: Team[] }) {
 
   async function simulateRound() {
     if (!selected || !enemy) {
-      setError("Pick one of your three teams first.");
+      setSpinError("Pick one of your three teams first.");
       return;
     }
 
+    await simulateMatchup(selected, enemy, setSpinError);
+  }
+
+  async function simulateManualRound() {
+    if (!manualSelected || !enemy) {
+      setManualError("Choose a team first.");
+      return;
+    }
+
+    if (manualSelected.id === enemy.id) {
+      setManualError("Choose a different team than the challenger.");
+      return;
+    }
+
+    await simulateMatchup(manualSelected, enemy, setManualError);
+  }
+
+  async function simulateMatchup(userTeam: Team, opponentTeam: Team, setRoundError: (message: string) => void) {
     setIsSimulating(true);
-    setError("");
+    setSpinError("");
+    setManualError("");
     const response = await fetch("/api/simulate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        teamAId: selected.id,
-        teamBId: enemy.id,
+        teamAId: userTeam.id,
+        teamBId: opponentTeam.id,
         mode: "single_game",
         ruleset: activeRuleset,
       }),
@@ -110,11 +145,11 @@ export function HomeGame({ teams }: { teams: Team[] }) {
     setIsSimulating(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Round failed.");
+      setRoundError(payload.error ?? "Round failed.");
       return;
     }
 
-    const nextHistory = saveRoundHistory(selected, enemy, payload);
+    const nextHistory = saveRoundHistory(userTeam, opponentTeam, payload);
     setHistory(nextHistory);
     router.push(`/result/${payload.simulationId}`);
   }
@@ -154,7 +189,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
           <div className="mb-4 text-center sm:mb-5">
             <h2 className="panel-title text-2xl font-black text-white sm:text-3xl">Pick your squad</h2>
             <p className="mt-2 text-sm font-semibold text-neutral-400">
-              Spin the wheels, then back one of the three squads.
+              Spin the wheels and choose the best squad.
             </p>
           </div>
 
@@ -211,7 +246,71 @@ export function HomeGame({ teams }: { teams: Team[] }) {
         <aside className="flex h-full flex-col overflow-hidden rounded-md border border-white/18 bg-neutral-950 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-5">
           {enemy ? <OpponentHeader team={enemy} /> : null}
           {enemy ? <TeamCard team={enemy} opponent /> : <EmptyPanel label="New Round sets the matchup." />}
-          {error ? <p className="mt-3 text-sm text-orange-300">{error}</p> : null}
+          {spinError ? <p className="mt-3 text-sm text-orange-300">{spinError}</p> : null}
+        </aside>
+      </section>
+
+      <section className="relative mx-auto mt-5 grid max-w-7xl items-stretch gap-4 sm:mt-7 sm:gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
+        <div className="h-full rounded-md border border-white/18 bg-neutral-950 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:p-5">
+          <div className="mb-4 text-center sm:mb-5">
+            <h2 className="panel-title text-2xl font-black text-white sm:text-3xl">Choose your squad</h2>
+          </div>
+
+          <label className="relative block">
+            <span className="sr-only">Search teams</span>
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" aria-hidden="true" />
+            <input
+              type="search"
+              value={manualSearch}
+              onChange={(event) => setManualSearch(event.target.value)}
+              placeholder="Search every team"
+              className="h-12 w-full rounded-md border border-white/15 bg-neutral-900 pl-11 pr-4 text-sm font-semibold text-white outline-none transition placeholder:text-neutral-500 focus:border-orange-300 focus:ring-2 focus:ring-orange-300/20"
+            />
+          </label>
+
+          <div className="mt-4 grid max-h-[360px] gap-2 overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-3">
+            {manualSearchResults.length ? (
+              manualSearchResults.map((team) => (
+                <button
+                  key={team.id}
+                  type="button"
+                  aria-pressed={manualSelectedId === team.id}
+                  onClick={() => {
+                    setManualSelectedId(team.id);
+                    setManualError("");
+                  }}
+                  className={`rounded-md border px-4 py-3 text-left transition ${
+                    manualSelectedId === team.id
+                      ? "border-orange-300 bg-orange-500 text-white shadow-[0_10px_28px_rgba(249,115,22,0.18)]"
+                      : "border-white/10 bg-neutral-900 text-white hover:border-orange-300 hover:bg-neutral-800"
+                  }`}
+                >
+                  <span className="block text-xs font-black uppercase tracking-[0.14em] text-current/75">{team.season}</span>
+                  <span className="mt-1 block text-sm font-black leading-5">{team.franchise}</span>
+                </button>
+              ))
+            ) : (
+              <div className="rounded-md border border-dashed border-white/15 bg-neutral-900 p-6 text-center text-sm font-semibold text-neutral-300 sm:col-span-2 lg:col-span-3">
+                No teams found.
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={simulateManualRound}
+            disabled={!manualSelected || !enemy || manualSelected.id === enemy.id || isSimulating || isSpinning}
+            className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-orange-500 px-4 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(255,107,0,0.2)] transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:bg-neutral-800 disabled:text-neutral-500 disabled:shadow-none"
+          >
+            {isSimulating ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <ChevronRight className="h-4 w-4" aria-hidden="true" />}
+            Simulate
+          </button>
+        </div>
+
+        <aside className="flex h-full flex-col overflow-hidden rounded-md border border-white/18 bg-neutral-950 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-5">
+          {enemy ? <OpponentHeader team={enemy} /> : null}
+          {enemy ? <TeamCard team={enemy} opponent /> : <EmptyPanel label="New Round sets the matchup." />}
+          {manualError ? <p className="mt-3 text-sm text-orange-300">{manualError}</p> : null}
         </aside>
       </section>
       <HistoryDialog
@@ -454,6 +553,40 @@ function TeamMark({ team }: { team: Team }) {
   );
 }
 
+const teamInitialsByFranchise: Record<string, string> = {
+  "Atlanta Hawks": "ATL",
+  "Boston Celtics": "BOS",
+  "Brooklyn Nets": "BKN",
+  "Charlotte Hornets": "CHA",
+  "Chicago Bulls": "CHI",
+  "Cleveland Cavaliers": "CLE",
+  "Dallas Mavericks": "DAL",
+  "Denver Nuggets": "DEN",
+  "Detroit Pistons": "DET",
+  "Golden State Warriors": "GSW",
+  "Houston Rockets": "HOU",
+  "Indiana Pacers": "IND",
+  "LA Clippers": "LAC",
+  "Los Angeles Lakers": "LAL",
+  "Memphis Grizzlies": "MEM",
+  "Miami Heat": "MIA",
+  "Milwaukee Bucks": "MIL",
+  "Minnesota Timberwolves": "MIN",
+  "New Orleans Pelicans": "NOP",
+  "New York Knicks": "NYK",
+  "Oklahoma City Thunder": "OKC",
+  "Orlando Magic": "ORL",
+  "Philadelphia 76ers": "PHI",
+  "Phoenix Suns": "PHX",
+  "Portland Trail Blazers": "POR",
+  "Sacramento Kings": "SAC",
+  "San Antonio Spurs": "SAS",
+  "Seattle SuperSonics": "SEA",
+  "Toronto Raptors": "TOR",
+  "Utah Jazz": "UTA",
+  "Washington Wizards": "WAS",
+};
+
 function IdleSlot({ index }: { index: number }) {
   return (
     <div className="slot-idle grid h-[180px] place-items-center rounded-md border border-slate-700 bg-slate-950 p-5 text-center sm:h-[230px]">
@@ -496,14 +629,15 @@ function buildPreviewWheel(teams: Team[]): WheelState {
 }
 
 function getTeamInitials(franchise: string) {
-  const stopWords = new Set(["Los", "Angeles", "Golden", "State", "Oklahoma", "City", "San"]);
-  const words = franchise.split(" ").filter((word) => !stopWords.has(word));
-  const source = words.length ? words : franchise.split(" ");
-  return source
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
+  return (
+    teamInitialsByFranchise[franchise] ??
+    franchise
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .slice(0, 3)
+      .toUpperCase()
+  );
 }
 
 function buildWheelForTarget(pool: Team[], target: Team, wheelIndex: number): WheelState {
