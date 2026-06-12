@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Analytics } from "@vercel/analytics/next";
 import { Code2 } from "lucide-react";
+import { MainNav } from "@/components/MainNav";
 import { PublicShareHostRedirect } from "@/components/PublicShareHostRedirect";
 import "./globals.css";
 
@@ -30,7 +31,7 @@ export default function RootLayout({
         <CourtBackground />
         <div className="min-h-screen">
           <header className="relative z-50">
-            <div className="mx-auto flex max-w-7xl items-center justify-center px-4 pb-1 pt-3 sm:px-6 sm:pb-2 sm:pt-4 lg:px-8">
+            <div className="mx-auto flex max-w-7xl flex-col items-center justify-center px-4 pb-1 pt-3 sm:px-6 sm:pb-2 sm:pt-4 lg:px-8">
               <Link href="/" className="group flex flex-col items-center gap-0">
                 <span className="relative block h-16 w-16 transition duration-200 group-hover:scale-105 sm:h-24 sm:w-24">
                   <Image
@@ -51,6 +52,7 @@ export default function RootLayout({
                   </span>
                 </span>
               </Link>
+              <MainNav />
               <a
                 href="https://github.com/Dheerajsom/Timeout"
                 target="_blank"
