@@ -4,7 +4,7 @@ import { PUBLIC_SITE_ORIGIN } from "@/lib/siteUrl";
 
 const PUBLIC_SITE_HOST = new URL(PUBLIC_SITE_ORIGIN).host;
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const host = request.headers.get("host") ?? request.nextUrl.host;
   const hostname = host.split(":")[0];
 

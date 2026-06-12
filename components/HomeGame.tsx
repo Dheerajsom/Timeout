@@ -121,12 +121,6 @@ export function HomeGame({ teams }: { teams: Team[] }) {
 
   return (
     <main className="relative min-h-screen overflow-hidden px-4 pb-10 pt-1 sm:px-6 sm:pb-8 sm:pt-4 lg:px-8">
-      <div className="absolute inset-0 halftone opacity-[0.045]" aria-hidden="true" />
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-black/26 via-black/8 to-transparent"
-        aria-hidden="true"
-      />
-
       <section className="relative mx-auto max-w-5xl text-center">
         <h1 className="hero-title text-[2rem] font-black leading-tight tracking-normal sm:text-4xl">
           Matchups time never gave us.
@@ -159,6 +153,9 @@ export function HomeGame({ teams }: { teams: Team[] }) {
         <div className="h-full rounded-md border border-white/18 bg-neutral-950 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:p-5">
           <div className="mb-4 text-center sm:mb-5">
             <h2 className="panel-title text-2xl font-black text-white sm:text-3xl">Pick your squad</h2>
+            <p className="mt-2 text-sm font-semibold text-neutral-400">
+              Spin the wheels, then back one of the three squads.
+            </p>
           </div>
 
           {isSpinning ? (
@@ -173,6 +170,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
                 <button
                   key={team.id}
                   type="button"
+                  aria-pressed={selectedId === team.id}
                   onClick={() => setSelectedId(team.id)}
                   className={`text-left transition ${selectedId === team.id ? "scale-[1.01]" : "hover:-translate-y-1"}`}
                 >
@@ -202,7 +200,7 @@ export function HomeGame({ teams }: { teams: Team[] }) {
               type="button"
               onClick={simulateRound}
               disabled={!selected || !enemy || isSimulating || isSpinning}
-              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-orange-500 px-4 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(255,107,0,0.2)] transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:bg-slate-500 disabled:text-slate-950 disabled:shadow-none"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-orange-500 px-4 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(255,107,0,0.2)] transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:bg-neutral-800 disabled:text-neutral-500 disabled:shadow-none"
             >
               {isSimulating ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <ChevronRight className="h-4 w-4" aria-hidden="true" />}
               Simulate
@@ -378,11 +376,16 @@ function TeamCard({
             : "border-slate-700"
       }`}
     >
+      {selected ? (
+        <span className="!absolute right-3 top-3 z-10 rounded-full bg-orange-500 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-white shadow-[0_6px_16px_rgba(0,0,0,0.35)]">
+          Your pick
+        </span>
+      ) : null}
       <div className="flex h-full min-h-[130px] flex-col justify-between sm:min-h-[170px]">
         <TeamMark team={team} />
         <div>
-          <div className="text-xs font-black uppercase tracking-[0.16em] text-white/85">{team.season}</div>
-          <div className="mt-2 text-xl font-black leading-6 text-white sm:text-2xl sm:leading-7">{team.franchise}</div>
+          <div className="text-xs font-black uppercase tracking-[0.16em] text-white/90 drop-shadow-[0_1px_0_rgba(0,0,0,0.5)]">{team.season}</div>
+          <div className="mt-2 text-xl font-black leading-6 text-white drop-shadow-[0_1px_0_rgba(0,0,0,0.5)] sm:text-2xl sm:leading-7">{team.franchise}</div>
         </div>
       </div>
     </div>
@@ -420,13 +423,13 @@ function WheelTeam({ team }: { team: Team }) {
     <div
       className="flex h-[164px] items-center rounded-md border border-white/15 px-3 shadow-[0_10px_24px_rgba(0,0,0,0.18)] sm:h-[82px]"
       style={{
-        background: `linear-gradient(135deg, ${colors.primary} 0 52%, ${colors.secondary} 52% 100%)`,
+        background: `linear-gradient(90deg, rgba(0,0,0,0.42), rgba(0,0,0,0.1) 55%, transparent 78%), linear-gradient(135deg, ${colors.primary} 0 52%, ${colors.secondary} 52% 100%)`,
         boxShadow: `inset 5px 0 0 ${colors.accent}, 0 10px 24px rgba(0,0,0,0.18)`,
       }}
     >
       <div>
-        <div className="text-[11px] font-black uppercase tracking-[0.16em] text-white/85">{team.season}</div>
-        <div className="mt-1 text-base font-black leading-5 text-white">{team.franchise}</div>
+        <div className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 drop-shadow-[0_1px_0_rgba(0,0,0,0.5)]">{team.season}</div>
+        <div className="mt-1 text-base font-black leading-5 text-white drop-shadow-[0_1px_0_rgba(0,0,0,0.5)]">{team.franchise}</div>
       </div>
     </div>
   );
@@ -445,7 +448,7 @@ function TeamMark({ team }: { team: Team }) {
   const initials = getTeamInitials(team.franchise);
 
   return (
-    <div className="grid h-12 w-12 place-items-center rounded-full border border-white/30 bg-white/20 text-sm font-black tracking-normal text-white shadow-[0_12px_28px_rgba(0,0,0,0.24)]">
+    <div className="grid h-12 w-12 place-items-center rounded-full border border-white/40 bg-black/30 text-sm font-black tracking-normal text-white shadow-[0_12px_28px_rgba(0,0,0,0.24)]">
       {initials}
     </div>
   );
