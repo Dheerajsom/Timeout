@@ -4,9 +4,16 @@ import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight, Dices, History, Loader2, Search, X } from "lucide-react";
+import { ChevronRight, Dices, History, Loader2, X } from "lucide-react";
 import { getTeamColors } from "@/lib/teamColors";
-import type { SimulatedGame, SimulatedSeries, Team } from "@/types/simulation";
+import {
+  formatHistoryDate,
+  readRoundHistory,
+  saveRoundHistory,
+  type RoundHistoryEntry,
+  type SimulationPayload,
+} from "@/lib/roundHistory";
+import type { Team } from "@/types/simulation";
 
 const activeRuleset = "modern";
 const spinDuration = 5000;
@@ -14,28 +21,10 @@ const mobileItemPitch = 176;
 const mobileDistanceAdjustment = 4;
 const desktopItemPitch = 94;
 const desktopTargetOffset = 62;
-const historyStorageKey = "timeout-round-history";
-const historyLimit = 30;
 
 type WheelState = {
   teams: Team[];
   targetIndex: number;
-};
-
-type RoundHistoryEntry = {
-  id: string;
-  playedAt: string;
-  userTeam: string;
-  opponentTeam: string;
-  userScore: number;
-  opponentScore: number;
-  userWon: boolean;
-  resultUrl: string;
-};
-
-type SimulationPayload = {
-  simulationId: string;
-  result: SimulatedGame | SimulatedSeries;
 };
 
 export function HomeGame({ teams }: { teams: Team[] }) {
@@ -45,25 +34,12 @@ export function HomeGame({ teams }: { teams: Team[] }) {
   const [wheels, setWheels] = useState<WheelState[]>([]);
   const [enemy, setEnemy] = useState<Team | null>(null);
   const [selectedId, setSelectedId] = useState("");
-  const [manualSelectedId, setManualSelectedId] = useState("");
-  const [manualSearch, setManualSearch] = useState("");
   const [isSimulating, setIsSimulating] = useState(false);
   const [spinError, setSpinError] = useState("");
-  const [manualError, setManualError] = useState("");
   const [history, setHistory] = useState<RoundHistoryEntry[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const selected = choices.find((team) => team.id === selectedId) ?? null;
-  const manualSelected = teams.find((team) => team.id === manualSelectedId) ?? null;
-  const manualSearchResults = useMemo(() => {
-    const query = manualSearch.trim().toLowerCase();
-
-    if (!query) {
-      return teams;
-    }
-
-    return teams.filter((team) => `${team.season} ${team.franchise}`.toLowerCase().includes(query));
-  }, [manualSearch, teams]);
   const fallbackWheels = useMemo(
     () => [buildPreviewWheel(teams), buildPreviewWheel(teams), buildPreviewWheel(teams)],
     [teams],
@@ -77,10 +53,8 @@ export function HomeGame({ teams }: { teams: Team[] }) {
 
   function startNewRound() {
     setSpinError("");
-    setManualError("");
     setIsSpinning(false);
     setSelectedId("");
-    setManualSelectedId("");
     setChoices([]);
     setWheels([buildPreviewWheel(teams), buildPreviewWheel(teams), buildPreviewWheel(teams)]);
     setEnemy(drawTeams(teams, 1)[0]);
@@ -92,7 +66,6 @@ export function HomeGame({ teams }: { teams: Team[] }) {
     const nextWheels = nextChoices.map((choice, index) => buildWheelForTarget(pool, choice, index));
 
     setSpinError("");
-    setManualError("");
     setSelectedId("");
     setChoices([]);
     setWheels(nextWheels);
@@ -113,42 +86,36 @@ export function HomeGame({ teams }: { teams: Team[] }) {
     await simulateMatchup(selected, enemy, setSpinError);
   }
 
-  async function simulateManualRound() {
-    if (!manualSelected || !enemy) {
-      setManualError("Choose a team first.");
-      return;
-    }
-
-    if (manualSelected.id === enemy.id) {
-      setManualError("Choose a different team than the challenger.");
-      return;
-    }
-
-    await simulateMatchup(manualSelected, enemy, setManualError);
-  }
-
   async function simulateMatchup(userTeam: Team, opponentTeam: Team, setRoundError: (message: string) => void) {
     setIsSimulating(true);
     setSpinError("");
-    setManualError("");
-    const response = await fetch("/api/simulate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        teamAId: userTeam.id,
-        teamBId: opponentTeam.id,
-        mode: "single_game",
-        ruleset: activeRuleset,
-      }),
-    });
-    const payload = (await response.json()) as SimulationPayload & { error?: string };
-    setIsSimulating(false);
 
-    if (!response.ok) {
-      setRoundError(payload.error ?? "Round failed.");
+    let payload: SimulationPayload & { error?: string };
+    try {
+      const response = await fetch("/api/simulate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          teamAId: userTeam.id,
+          teamBId: opponentTeam.id,
+          mode: "single_game",
+          ruleset: activeRuleset,
+        }),
+      });
+      payload = (await response.json()) as SimulationPayload & { error?: string };
+
+      if (!response.ok) {
+        setIsSimulating(false);
+        setRoundError(payload.error ?? "Round failed.");
+        return;
+      }
+    } catch {
+      setIsSimulating(false);
+      setRoundError("Round failed. Check your connection and try again.");
       return;
     }
 
+    setIsSimulating(false);
     const nextHistory = saveRoundHistory(userTeam, opponentTeam, payload);
     setHistory(nextHistory);
     router.push(`/result/${payload.simulationId}`);
@@ -250,69 +217,6 @@ export function HomeGame({ teams }: { teams: Team[] }) {
         </aside>
       </section>
 
-      <section className="relative mx-auto mt-5 grid max-w-7xl items-stretch gap-4 sm:mt-7 sm:gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
-        <div className="h-full rounded-md border border-white/18 bg-neutral-950 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:p-5">
-          <div className="mb-4 text-center sm:mb-5">
-            <h2 className="panel-title text-2xl font-black text-white sm:text-3xl">Choose your squad</h2>
-          </div>
-
-          <label className="relative block">
-            <span className="sr-only">Search teams</span>
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" aria-hidden="true" />
-            <input
-              type="search"
-              value={manualSearch}
-              onChange={(event) => setManualSearch(event.target.value)}
-              placeholder="Search every team"
-              className="h-12 w-full rounded-md border border-white/15 bg-neutral-900 pl-11 pr-4 text-sm font-semibold text-white outline-none transition placeholder:text-neutral-500 focus:border-orange-300 focus:ring-2 focus:ring-orange-300/20"
-            />
-          </label>
-
-          <div className="mt-4 grid max-h-[360px] gap-2 overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-3">
-            {manualSearchResults.length ? (
-              manualSearchResults.map((team) => (
-                <button
-                  key={team.id}
-                  type="button"
-                  aria-pressed={manualSelectedId === team.id}
-                  onClick={() => {
-                    setManualSelectedId(team.id);
-                    setManualError("");
-                  }}
-                  className={`rounded-md border px-4 py-3 text-left transition ${
-                    manualSelectedId === team.id
-                      ? "border-orange-300 bg-orange-500 text-white shadow-[0_10px_28px_rgba(249,115,22,0.18)]"
-                      : "border-white/10 bg-neutral-900 text-white hover:border-orange-300 hover:bg-neutral-800"
-                  }`}
-                >
-                  <span className="block text-xs font-black uppercase tracking-[0.14em] text-current/75">{team.season}</span>
-                  <span className="mt-1 block text-sm font-black leading-5">{team.franchise}</span>
-                </button>
-              ))
-            ) : (
-              <div className="rounded-md border border-dashed border-white/15 bg-neutral-900 p-6 text-center text-sm font-semibold text-neutral-300 sm:col-span-2 lg:col-span-3">
-                No teams found.
-              </div>
-            )}
-          </div>
-
-          <button
-            type="button"
-            onClick={simulateManualRound}
-            disabled={!manualSelected || !enemy || manualSelected.id === enemy.id || isSimulating || isSpinning}
-            className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-orange-500 px-4 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(255,107,0,0.2)] transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:bg-neutral-800 disabled:text-neutral-500 disabled:shadow-none"
-          >
-            {isSimulating ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <ChevronRight className="h-4 w-4" aria-hidden="true" />}
-            Simulate
-          </button>
-        </div>
-
-        <aside className="flex h-full flex-col overflow-hidden rounded-md border border-white/18 bg-neutral-950 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-5">
-          {enemy ? <OpponentHeader team={enemy} /> : null}
-          {enemy ? <TeamCard team={enemy} opponent /> : <EmptyPanel label="New Round sets the matchup." />}
-          {manualError ? <p className="mt-3 text-sm text-orange-300">{manualError}</p> : null}
-        </aside>
-      </section>
       <HistoryDialog
         history={history}
         isOpen={isHistoryOpen}
@@ -651,72 +555,3 @@ function buildWheelForTarget(pool: Team[], target: Team, wheelIndex: number): Wh
   };
 }
 
-function readRoundHistory() {
-  try {
-    const raw = window.localStorage.getItem(historyStorageKey);
-    if (!raw) {
-      return [];
-    }
-
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-
-    return parsed.filter(isRoundHistoryEntry).slice(0, historyLimit);
-  } catch {
-    return [];
-  }
-}
-
-function saveRoundHistory(userTeam: Team, opponentTeam: Team, payload: SimulationPayload) {
-  const result = payload.result;
-  const game = result.type === "single_game" ? result : result.decidingGame;
-  const userIsTeamA = result.teamA.id === userTeam.id;
-  const entry: RoundHistoryEntry = {
-    id: payload.simulationId,
-    playedAt: new Date().toISOString(),
-    userTeam: `${userTeam.season} ${userTeam.franchise}`,
-    opponentTeam: `${opponentTeam.season} ${opponentTeam.franchise}`,
-    userScore: userIsTeamA ? game.teamAScore : game.teamBScore,
-    opponentScore: userIsTeamA ? game.teamBScore : game.teamAScore,
-    userWon: result.winnerTeamId === userTeam.id,
-    resultUrl: `/result/${payload.simulationId}`,
-  };
-  const nextHistory = [entry, ...readRoundHistory().filter((round) => round.id !== entry.id)].slice(0, historyLimit);
-
-  try {
-    window.localStorage.setItem(historyStorageKey, JSON.stringify(nextHistory));
-  } catch {
-    return nextHistory;
-  }
-
-  return nextHistory;
-}
-
-function isRoundHistoryEntry(value: unknown): value is RoundHistoryEntry {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  const entry = value as Partial<RoundHistoryEntry>;
-  return (
-    typeof entry.id === "string" &&
-    typeof entry.playedAt === "string" &&
-    typeof entry.userTeam === "string" &&
-    typeof entry.opponentTeam === "string" &&
-    typeof entry.userScore === "number" &&
-    typeof entry.opponentScore === "number" &&
-    typeof entry.userWon === "boolean" &&
-    typeof entry.resultUrl === "string"
-  );
-}
-
-function formatHistoryDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(value));
-}
