@@ -20,6 +20,35 @@ type TeamInput = Omit<Team, "players"> & { players: PlayerTuple[] };
 
 const teamSeeds: TeamInput[] = [
   {
+    id: "2023-omp-hoopers",
+    name: "2023 OMP Hoopers",
+    franchise: "OMP Hoopers",
+    season: "2022-23",
+    logoUrl: "/omp-hoopers-logo.png",
+    wins: 76,
+    losses: 6,
+    pace: 96,
+    offense: 100,
+    defense: 94,
+    spacing: 98,
+    rimPressure: 96,
+    rebounding: 92,
+    playmaking: 97,
+    starPower: 100,
+    benchDepth: 72,
+    clutch: 99,
+    physicality: 95,
+    styleSummary:
+      "A star-heavy custom squad with two GOAT-tier engines, elite wing support, and enough pace and spacing to overwhelm most eras.",
+    players: [
+      ["Rishon Nazareth", "PG", 34, 24, 84, 82, 82, 91, 50, 78, 16, 76, 86],
+      ["Vipransh Sinha", "SG", 40, 36, 100, 96, 98, 90, 70, 92, 42, 93, 99],
+      ["Dheeraj Somashekar", "SF", 36, 27, 92, 89, 88, 82, 80, 91, 55, 88, 92],
+      ["Lakshay Soin", "PF", 40, 35, 99, 95, 90, 88, 96, 94, 86, 98, 99],
+      ["Ishaan Brar", "C", 36, 25, 91, 90, 35, 72, 95, 92, 96, 94, 90],
+    ],
+  },
+  {
     id: "2017-warriors",
     name: "2017 Golden State Warriors",
     franchise: "Golden State Warriors",

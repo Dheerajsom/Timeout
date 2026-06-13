@@ -17,6 +17,12 @@ import type { Team } from "@/types/simulation";
 
 const activeRuleset = "modern";
 const spinDuration = 5000;
+const opponentTeamWeights: Record<string, number> = {
+  "2023-omp-hoopers": 90,
+};
+const spinChoiceTeamWeights: Record<string, number> = {
+  "2023-omp-hoopers": 45,
+};
 const mobileItemPitch = 176;
 const mobileDistanceAdjustment = 4;
 const desktopItemPitch = 94;
@@ -57,13 +63,13 @@ export function HomeGame({ teams }: { teams: Team[] }) {
     setSelectedId("");
     setChoices([]);
     setWheels([buildPreviewWheel(teams), buildPreviewWheel(teams), buildPreviewWheel(teams)]);
-    setEnemy(drawTeams(teams, 1)[0]);
+    setEnemy(drawTeams(teams, 1, opponentTeamWeights)[0]);
   }
 
   function spinWheels() {
     const pool = enemy ? teams.filter((team) => team.id !== enemy.id) : teams;
-    const nextChoices = drawTeams(pool, 3);
-    const nextWheels = nextChoices.map((choice, index) => buildWheelForTarget(pool, choice, index));
+    const nextChoices = drawTeams(pool, 3, spinChoiceTeamWeights);
+    const nextWheels = nextChoices.map((choice, index) => buildWheelForTarget(pool, choice, index, spinChoiceTeamWeights));
 
     setSpinError("");
     setSelectedId("");
@@ -452,7 +458,11 @@ function TeamMark({ team }: { team: Team }) {
 
   return (
     <div className="grid h-12 w-12 place-items-center rounded-full border border-white/40 bg-black/30 text-sm font-black tracking-normal text-white shadow-[0_12px_28px_rgba(0,0,0,0.24)]">
-      {initials}
+      {team.logoUrl ? (
+        <img src={team.logoUrl} alt="" className="h-10 w-10 rounded-full object-cover" />
+      ) : (
+        initials
+      )}
     </div>
   );
 }
@@ -512,12 +522,12 @@ function EmptyPanel({ label }: { label: string }) {
   );
 }
 
-function drawTeams(pool: Team[], count: number) {
+function drawTeams(pool: Team[], count: number, weights: Record<string, number> = {}) {
   const copy = [...pool];
   const drawn: Team[] = [];
 
   while (drawn.length < count && copy.length) {
-    const index = Math.floor(Math.random() * copy.length);
+    const index = drawWeightedTeamIndex(copy, weights);
     const [team] = copy.splice(index, 1);
     drawn.push(team);
   }
@@ -544,9 +554,9 @@ function getTeamInitials(franchise: string) {
   );
 }
 
-function buildWheelForTarget(pool: Team[], target: Team, wheelIndex: number): WheelState {
+function buildWheelForTarget(pool: Team[], target: Team, wheelIndex: number, weights: Record<string, number>): WheelState {
   const targetIndex = 17 + wheelIndex;
-  const wheel = Array.from({ length: targetIndex + 5 }, () => pool[Math.floor(Math.random() * pool.length)]);
+  const wheel = Array.from({ length: targetIndex + 5 }, () => pool[drawWeightedTeamIndex(pool, weights)]);
   wheel[targetIndex] = target;
 
   return {
@@ -555,3 +565,20 @@ function buildWheelForTarget(pool: Team[], target: Team, wheelIndex: number): Wh
   };
 }
 
+function drawWeightedTeamIndex(pool: Team[], weights: Record<string, number>) {
+  const totalWeight = pool.reduce((total, team) => total + getTeamDrawWeight(team, weights), 0);
+  let cursor = Math.random() * totalWeight;
+
+  for (let index = 0; index < pool.length; index += 1) {
+    cursor -= getTeamDrawWeight(pool[index], weights);
+    if (cursor <= 0) {
+      return index;
+    }
+  }
+
+  return Math.max(0, pool.length - 1);
+}
+
+function getTeamDrawWeight(team: Team, weights: Record<string, number>) {
+  return weights[team.id] ?? 1;
+}
