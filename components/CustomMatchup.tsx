@@ -336,11 +336,15 @@ function SquadPicker({
   }, [teams]);
 
   const query = search.trim().toLowerCase();
-  const results = teams.filter((team) => {
+  const matches = teams.filter((team) => {
     if (decade !== "all" && decadeOf(team) !== decade) return false;
     if (query && !`${team.season} ${team.franchise}`.toLowerCase().includes(query)) return false;
     return true;
   });
+  // The full pool is ~1,300 teams; cap the rendered list and nudge users to filter.
+  const visibleLimit = 150;
+  const results = matches.slice(0, visibleLimit);
+  const hiddenCount = matches.length - results.length;
 
   return (
     <div className={`min-w-0 rounded-lg border border-white/18 bg-neutral-950/95 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:p-5 ${className}`}>
@@ -427,6 +431,11 @@ function SquadPicker({
             No teams found.
           </div>
         )}
+        {hiddenCount > 0 ? (
+          <div className="rounded-md border border-dashed border-white/15 bg-neutral-900 p-3 text-center text-xs font-semibold text-neutral-400 sm:col-span-2">
+            +{hiddenCount} more — search a team or pick an era to narrow it down.
+          </div>
+        ) : null}
       </div>
     </div>
   );

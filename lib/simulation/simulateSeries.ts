@@ -1,4 +1,4 @@
-import type { PlayerBoxScore, Ruleset, SeriesGame, SimulatedSeries, Team } from "@/types/simulation";
+import type { PlayerBoxScore, Ruleset, SeriesGame, SimulatedGame, SimulatedSeries, Team } from "@/types/simulation";
 import { simulateGame } from "./simulateGame";
 
 function round1(value: number) {
@@ -19,7 +19,7 @@ export function simulateSeries({
   let teamAWins = 0;
   let teamBWins = 0;
   const games: SeriesGame[] = [];
-  let decidingGame = simulateGame({ teamA, teamB, ruleset, seed: `${seed}-g1` });
+  let decidingGame!: SimulatedGame; // assigned on the first (always-run) loop iteration
 
   for (let gameNumber = 1; gameNumber <= 7; gameNumber += 1) {
     const game = simulateGame({ teamA, teamB, ruleset, seed: `${seed}-g${gameNumber}` });

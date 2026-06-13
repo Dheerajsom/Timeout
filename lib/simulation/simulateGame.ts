@@ -27,7 +27,9 @@ export function simulateGame({
   let scoreB = makeScore({ team: teamB, opponent: teamA, strength: strengthB - strengthA, pace: averagePace, rng, ruleset });
 
   if (scoreA === scoreB) {
-    scoreB += rng.next() > 0.5 ? 1 : -1;
+    // Break the tie. Bias upward when already at the score floor so we never dip below it.
+    const bump = rng.next() > 0.5 ? 1 : -1;
+    scoreB += scoreB <= 82 ? 1 : bump;
   }
 
   const teamAQuarters = splitIntoQuarters(scoreA, rng);
