@@ -64,6 +64,24 @@ input {
   opacity: 0.92;
 }
 
+.vs-badge {
+  border: 2px solid #fff7ed;
+  animation: vsPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes vsPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 22px rgba(249, 115, 22, 0.4);
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 38px rgba(249, 115, 22, 0.65);
+    transform: scale(1.05);
+  }
+}
+
 .reel-window {
   mask-image: linear-gradient(transparent, black 18%, black 82%, transparent);
 }

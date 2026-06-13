@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronRight, Loader2, Search, Swords } from "lucide-react";
+import { ChevronRight, Loader2, Search, Swords, X } from "lucide-react";
+import { getTeamColors } from "@/lib/teamColors";
 import { modeOptions } from "@/lib/simulation/constants";
 import { saveRoundHistory, type SimulationPayload } from "@/lib/roundHistory";
 import type { SimulationMode, Team } from "@/types/simulation";
@@ -20,6 +21,7 @@ export function CustomMatchup({ teams }: { teams: Team[] }) {
   const teamA = teams.find((team) => team.id === teamAId) ?? null;
   const teamB = teams.find((team) => team.id === teamBId) ?? null;
   const sameTeam = Boolean(teamA && teamB && teamA.id === teamB.id);
+  const ready = Boolean(teamA && teamB && !sameTeam);
 
   async function simulateMatchup() {
     if (!teamA || !teamB) {
@@ -66,7 +68,7 @@ export function CustomMatchup({ teams }: { teams: Team[] }) {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden px-4 pb-10 pt-1 sm:px-6 sm:pb-8 sm:pt-4 lg:px-8">
+    <main className="relative min-h-screen overflow-hidden px-4 pb-28 pt-1 sm:px-6 sm:pb-10 sm:pt-4 lg:px-8">
       <section className="relative mx-auto max-w-5xl text-center">
         <h1 className="hero-title text-[2rem] font-black leading-tight tracking-normal sm:text-4xl">
           Build your own matchup.
@@ -76,55 +78,35 @@ export function CustomMatchup({ teams }: { teams: Team[] }) {
         </p>
       </section>
 
-      <section className="relative mx-auto mt-5 grid max-w-7xl items-stretch gap-4 sm:mt-7 sm:gap-5 lg:grid-cols-2">
-        <SquadPicker
-          title="Your squad"
-          teams={teams}
-          selectedId={teamAId}
-          excludedId={teamBId}
-          onSelect={(id) => {
-            setTeamAId(id);
-            setError("");
-          }}
-        />
-        <SquadPicker
-          title="Opponent squad"
-          teams={teams}
-          selectedId={teamBId}
-          excludedId={teamAId}
-          onSelect={(id) => {
-            setTeamBId(id);
-            setError("");
-          }}
-        />
-      </section>
-
-      <section className="relative mx-auto mt-4 max-w-7xl rounded-md border border-white/18 bg-neutral-950 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:mt-5 sm:p-5">
-        <div className="grid items-end gap-3 sm:grid-cols-[1fr_auto_auto]">
-          <div className="flex min-h-12 items-center justify-center rounded-md border border-white/10 bg-neutral-900 px-4 py-2 text-center sm:justify-start sm:text-left">
-            {teamA || teamB ? (
-              <span className="text-sm font-black text-white">
-                <span className={teamA ? "" : "text-neutral-500"}>
-                  {teamA ? `${teamA.season} ${teamA.franchise}` : "Pick your squad"}
-                </span>
-                <span className="mx-2 text-orange-300">vs</span>
-                <span className={teamB ? "" : "text-neutral-500"}>
-                  {teamB ? `${teamB.season} ${teamB.franchise}` : "Pick the opponent"}
-                </span>
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-2 text-sm font-semibold text-neutral-400">
-                <Swords className="h-4 w-4" aria-hidden="true" />
-                Pick two squads to set the matchup.
-              </span>
-            )}
+      {/* Face-off marquee */}
+      <section className="relative mx-auto mt-5 max-w-7xl rounded-lg border border-white/18 bg-neutral-950/95 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:mt-7 sm:p-6">
+        <div className="grid items-stretch gap-3 sm:grid-cols-[1fr_auto_1fr] sm:gap-5">
+          <FaceoffCard
+            team={teamA}
+            side="home"
+            placeholder="Your squad"
+            onClear={() => setTeamAId("")}
+          />
+          <div className="relative flex items-center justify-center py-1 sm:py-0">
+            <span className="vs-badge relative z-10 grid h-14 w-14 place-items-center rounded-full bg-orange-500 text-lg font-black italic text-white shadow-[0_0_30px_rgba(249,115,22,0.45)] sm:h-16 sm:w-16 sm:text-xl">
+              VS
+            </span>
           </div>
+          <FaceoffCard
+            team={teamB}
+            side="away"
+            placeholder="Opponent squad"
+            onClear={() => setTeamBId("")}
+          />
+        </div>
+
+        <div className="mt-4 hidden items-end justify-center gap-3 sm:flex">
           <label className="block">
             <span className="mb-1.5 block text-xs font-black uppercase tracking-[0.16em] text-neutral-400">Mode</span>
             <select
               value={mode}
               onChange={(event) => setMode(event.target.value as SimulationMode)}
-              className="h-12 w-full rounded-md border border-white/15 bg-neutral-900 px-3 text-sm font-semibold text-white outline-none transition focus:border-orange-300 sm:w-44"
+              className="h-12 w-44 rounded-md border border-white/15 bg-neutral-900 px-3 text-sm font-semibold text-white outline-none transition focus:border-orange-300"
             >
               {modeOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -136,41 +118,175 @@ export function CustomMatchup({ teams }: { teams: Team[] }) {
           <button
             type="button"
             onClick={simulateMatchup}
-            disabled={!teamA || !teamB || sameTeam || isSimulating}
-            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-orange-500 px-6 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(255,107,0,0.2)] transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:bg-neutral-800 disabled:text-neutral-500 disabled:shadow-none sm:w-auto"
+            disabled={!ready || isSimulating}
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-orange-500 px-8 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(255,107,0,0.3)] transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:bg-neutral-800 disabled:text-neutral-500 disabled:shadow-none"
           >
-            {isSimulating ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <ChevronRight className="h-4 w-4" aria-hidden="true" />}
+            {isSimulating ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Swords className="h-4 w-4" aria-hidden="true" />}
+            Simulate matchup
+          </button>
+        </div>
+        {error ? <p className="mt-3 text-center text-sm font-semibold text-orange-300">{error}</p> : null}
+      </section>
+
+      <section className="relative mx-auto mt-4 grid max-w-7xl items-start gap-4 sm:mt-6 sm:gap-5 lg:grid-cols-2">
+        <SquadPicker
+          title="Your squad"
+          accent="home"
+          teams={teams}
+          selectedId={teamAId}
+          excludedId={teamBId}
+          onSelect={(id) => {
+            setTeamAId(id);
+            setError("");
+          }}
+        />
+        <SquadPicker
+          title="Opponent squad"
+          accent="away"
+          teams={teams}
+          selectedId={teamBId}
+          excludedId={teamAId}
+          onSelect={(id) => {
+            setTeamBId(id);
+            setError("");
+          }}
+        />
+      </section>
+
+      {/* Mobile sticky action bar */}
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/15 bg-neutral-950/95 px-4 py-3 shadow-[0_-12px_40px_rgba(0,0,0,0.5)] backdrop-blur sm:hidden">
+        <div className="flex items-center gap-2">
+          <select
+            value={mode}
+            onChange={(event) => setMode(event.target.value as SimulationMode)}
+            aria-label="Mode"
+            className="h-12 min-w-0 flex-1 rounded-md border border-white/15 bg-neutral-900 px-3 text-sm font-semibold text-white outline-none transition focus:border-orange-300"
+          >
+            {modeOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={simulateMatchup}
+            disabled={!ready || isSimulating}
+            className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-md bg-orange-500 px-4 text-sm font-black uppercase text-white shadow-[0_10px_30px_rgba(255,107,0,0.3)] transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:bg-neutral-800 disabled:text-neutral-500 disabled:shadow-none"
+          >
+            {isSimulating ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Swords className="h-4 w-4" aria-hidden="true" />}
             Simulate
           </button>
         </div>
-        {error ? <p className="mt-3 text-sm text-orange-300">{error}</p> : null}
-      </section>
+      </div>
     </main>
   );
 }
 
+function FaceoffCard({
+  team,
+  side,
+  placeholder,
+  onClear,
+}: {
+  team: Team | null;
+  side: "home" | "away";
+  placeholder: string;
+  onClear: () => void;
+}) {
+  if (!team) {
+    return (
+      <div className="slot-idle flex min-h-[110px] flex-col items-center justify-center rounded-md border border-dashed border-white/20 bg-neutral-900 px-4 py-5 text-center sm:min-h-[150px]">
+        <Swords className="h-5 w-5 text-neutral-500" aria-hidden="true" />
+        <span className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-neutral-400">{placeholder}</span>
+        <span className="mt-1 text-[11px] font-semibold text-neutral-500">Pick from the list below</span>
+      </div>
+    );
+  }
+
+  const colors = getTeamColors(team);
+  const style = {
+    "--team-primary": colors.primary,
+    "--team-secondary": colors.secondary,
+    "--team-accent": colors.accent,
+  } as CSSProperties;
+
+  return (
+    <div
+      style={style}
+      className="team-card relative min-h-[110px] rounded-md border border-white/25 p-4 shadow-[0_18px_48px_rgba(0,0,0,0.4)] sm:min-h-[150px]"
+    >
+      <button
+        type="button"
+        onClick={onClear}
+        aria-label={`Clear ${placeholder.toLowerCase()}`}
+        className="!absolute right-2.5 top-2.5 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/45 text-white/85 transition hover:bg-black/70 hover:text-white"
+      >
+        <X className="h-3.5 w-3.5" aria-hidden="true" />
+      </button>
+      <div className={`flex h-full min-h-[78px] flex-col justify-between sm:min-h-[118px] ${side === "away" ? "items-end text-right" : ""}`}>
+        <span className="rounded-full bg-black/40 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white/90">
+          {side === "home" ? "Your squad" : "Opponent"}
+        </span>
+        <div>
+          <div className="text-xs font-black uppercase tracking-[0.16em] text-white/90 drop-shadow-[0_1px_0_rgba(0,0,0,0.5)]">{team.season}</div>
+          <div className="mt-1 text-xl font-black leading-6 text-white drop-shadow-[0_1px_0_rgba(0,0,0,0.5)] sm:text-2xl sm:leading-7">{team.franchise}</div>
+          <div className="mt-1 text-[11px] font-bold text-white/80 drop-shadow-[0_1px_0_rgba(0,0,0,0.5)]">
+            {team.wins}-{team.losses}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function decadeOf(team: Team) {
+  const year = Number.parseInt(team.season, 10);
+  if (Number.isNaN(year)) return null;
+  return `${Math.floor(year / 10) * 10}s`;
+}
+
 function SquadPicker({
   title,
+  accent,
   teams,
   selectedId,
   excludedId,
   onSelect,
 }: {
   title: string;
+  accent: "home" | "away";
   teams: Team[];
   selectedId: string;
   excludedId: string;
   onSelect: (id: string) => void;
 }) {
   const [search, setSearch] = useState("");
+  const [decade, setDecade] = useState("all");
+
+  const decades = useMemo(() => {
+    const set = new Set<string>();
+    for (const team of teams) {
+      const value = decadeOf(team);
+      if (value) set.add(value);
+    }
+    return Array.from(set).sort();
+  }, [teams]);
+
   const query = search.trim().toLowerCase();
-  const results = query
-    ? teams.filter((team) => `${team.season} ${team.franchise}`.toLowerCase().includes(query))
-    : teams;
+  const results = teams.filter((team) => {
+    if (decade !== "all" && decadeOf(team) !== decade) return false;
+    if (query && !`${team.season} ${team.franchise}`.toLowerCase().includes(query)) return false;
+    return true;
+  });
 
   return (
-    <div className="rounded-md border border-white/18 bg-neutral-950 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:p-5">
-      <div className="mb-4 text-center">
+    <div className="rounded-lg border border-white/18 bg-neutral-950/95 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:p-5">
+      <div className="mb-4 flex items-center justify-center gap-2 text-center">
+        <span
+          className={`h-2.5 w-2.5 rounded-full ${accent === "home" ? "bg-orange-400" : "bg-sky-400"}`}
+          aria-hidden="true"
+        />
         <h2 className="panel-title text-2xl font-black text-white sm:text-3xl">{title}</h2>
       </div>
 
@@ -186,11 +302,29 @@ function SquadPicker({
         />
       </label>
 
-      <div className="mt-4 grid max-h-[360px] gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
+      <div className="mt-3 flex gap-1.5 overflow-x-auto pb-1">
+        {["all", ...decades].map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setDecade(value)}
+            className={`shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] transition ${
+              decade === value
+                ? "border-orange-300 bg-orange-500 text-white"
+                : "border-white/15 bg-neutral-900 text-neutral-300 hover:border-orange-300/60 hover:text-white"
+            }`}
+          >
+            {value === "all" ? "All eras" : value}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-3 grid max-h-[340px] gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
         {results.length ? (
           results.map((team) => {
             const isSelected = selectedId === team.id;
             const isTaken = excludedId === team.id;
+            const colors = getTeamColors(team);
 
             return (
               <button
@@ -199,19 +333,28 @@ function SquadPicker({
                 aria-pressed={isSelected}
                 disabled={isTaken}
                 onClick={() => onSelect(team.id)}
-                className={`rounded-md border px-4 py-3 text-left transition ${
+                className={`group relative overflow-hidden rounded-md border px-4 py-3 text-left transition ${
                   isSelected
-                    ? "border-orange-300 bg-orange-500 text-white shadow-[0_10px_28px_rgba(249,115,22,0.18)]"
+                    ? "border-orange-300 bg-neutral-900 text-white shadow-[0_0_0_2px_rgba(251,146,60,0.35),0_10px_28px_rgba(249,115,22,0.18)]"
                     : isTaken
                       ? "cursor-not-allowed border-white/5 bg-neutral-900 text-neutral-600"
-                      : "border-white/10 bg-neutral-900 text-white hover:border-orange-300 hover:bg-neutral-800"
+                      : "border-white/10 bg-neutral-900 text-white hover:border-orange-300/70 hover:bg-neutral-800"
                 }`}
               >
-                <span className="block text-xs font-black uppercase tracking-[0.14em] text-current/75">{team.season}</span>
-                <span className="mt-1 block text-sm font-black leading-5">{team.franchise}</span>
+                <span
+                  aria-hidden="true"
+                  className={`absolute inset-y-0 left-0 w-1.5 transition-all group-hover:w-2 ${isTaken ? "opacity-30" : ""}`}
+                  style={{ background: `linear-gradient(180deg, ${colors.primary} 0 55%, ${colors.secondary} 55% 100%)` }}
+                />
+                <span className="block pl-2 text-xs font-black uppercase tracking-[0.14em] text-current/75">{team.season}</span>
+                <span className="mt-1 block pl-2 text-sm font-black leading-5">{team.franchise}</span>
                 {isTaken ? (
-                  <span className="mt-1 block text-[10px] font-black uppercase tracking-[0.14em] text-neutral-500">
+                  <span className="mt-1 block pl-2 text-[10px] font-black uppercase tracking-[0.14em] text-neutral-500">
                     Picked on the other side
+                  </span>
+                ) : isSelected ? (
+                  <span className="mt-1 block pl-2 text-[10px] font-black uppercase tracking-[0.14em] text-orange-300">
+                    In the matchup
                   </span>
                 ) : null}
               </button>
