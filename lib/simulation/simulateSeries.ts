@@ -1,5 +1,9 @@
-import type { Ruleset, SimulatedSeries, Team } from "@/types/simulation";
+import type { PlayerBoxScore, Ruleset, SeriesGame, SimulatedSeries, Team } from "@/types/simulation";
 import { simulateGame } from "./simulateGame";
+
+function round1(value: number) {
+  return Math.round(value * 10) / 10;
+}
 
 export function simulateSeries({
   teamA,
@@ -14,7 +18,7 @@ export function simulateSeries({
 }): SimulatedSeries {
   let teamAWins = 0;
   let teamBWins = 0;
-  const games = [];
+  const games: SeriesGame[] = [];
   let decidingGame = simulateGame({ teamA, teamB, ruleset, seed: `${seed}-g1` });
 
   for (let gameNumber = 1; gameNumber <= 7; gameNumber += 1) {
@@ -27,14 +31,7 @@ export function simulateSeries({
       teamBWins += 1;
     }
 
-    games.push({
-      gameNumber,
-      seed: game.seed,
-      winnerTeamId: game.winnerTeamId,
-      teamAScore: game.teamAScore,
-      teamBScore: game.teamBScore,
-      mvpName: game.mvp.name,
-    });
+    games.push({ ...game, gameNumber });
 
     if (teamAWins === 4 || teamBWins === 4) {
       break;
@@ -42,25 +39,51 @@ export function simulateSeries({
   }
 
   const winnerTeamId = teamAWins > teamBWins ? teamA.id : teamB.id;
-  const winnerBoxScores = games
-    .map((game) => simulateGame({ teamA, teamB, ruleset, seed: game.seed }))
-    .filter((game) => game.winnerTeamId === winnerTeamId)
-    .flatMap((game) => (winnerTeamId === teamA.id ? game.teamABoxScore : game.teamBBoxScore));
 
-  const totals = new Map<string, (typeof winnerBoxScores)[number]>();
-  winnerBoxScores.forEach((player) => {
-    const existing = totals.get(player.playerId);
-    if (!existing) {
-      totals.set(player.playerId, { ...player });
-      return;
-    }
-    existing.mvpScore += player.mvpScore;
-    existing.points += player.points;
-    existing.rebounds += player.rebounds;
-    existing.assists += player.assists;
+  // Average the winning team's box scores across every game in the series so the
+  // MVP card shows per-game averages rather than a running total.
+  const tally = new Map<string, { player: PlayerBoxScore; appearances: number }>();
+  games.forEach((game) => {
+    const boxScore = winnerTeamId === teamA.id ? game.teamABoxScore : game.teamBBoxScore;
+    boxScore.forEach((player) => {
+      const existing = tally.get(player.playerId);
+      if (!existing) {
+        tally.set(player.playerId, { player: { ...player }, appearances: 1 });
+        return;
+      }
+      existing.appearances += 1;
+      existing.player.mvpScore += player.mvpScore;
+      existing.player.minutes += player.minutes;
+      existing.player.points += player.points;
+      existing.player.rebounds += player.rebounds;
+      existing.player.assists += player.assists;
+      existing.player.steals += player.steals;
+      existing.player.blocks += player.blocks;
+      existing.player.turnovers += player.turnovers;
+      existing.player.threesMade += player.threesMade;
+      existing.player.fieldGoalsMade += player.fieldGoalsMade;
+      existing.player.fieldGoalsAttempted += player.fieldGoalsAttempted;
+      existing.player.plusMinus += player.plusMinus;
+    });
   });
 
-  const mvp = [...totals.values()].reduce((best, player) => (player.mvpScore > best.mvpScore ? player : best), [...totals.values()][0]);
+  const averages = [...tally.values()].map(({ player, appearances }) => ({
+    ...player,
+    mvpScore: player.mvpScore / appearances,
+    minutes: Math.round(player.minutes / appearances),
+    points: round1(player.points / appearances),
+    rebounds: round1(player.rebounds / appearances),
+    assists: round1(player.assists / appearances),
+    steals: round1(player.steals / appearances),
+    blocks: round1(player.blocks / appearances),
+    turnovers: round1(player.turnovers / appearances),
+    threesMade: round1(player.threesMade / appearances),
+    fieldGoalsMade: round1(player.fieldGoalsMade / appearances),
+    fieldGoalsAttempted: round1(player.fieldGoalsAttempted / appearances),
+    plusMinus: Math.round(player.plusMinus / appearances),
+  }));
+
+  const mvp = averages.reduce((best, player) => (player.mvpScore > best.mvpScore ? player : best), averages[0]);
 
   return {
     type: "best_of_7",

@@ -101,13 +101,8 @@ export type SimulatedGame = {
   matchupFactors: MatchupFactor[];
 };
 
-export type SeriesGameSummary = {
+export type SeriesGame = SimulatedGame & {
   gameNumber: number;
-  seed: string;
-  winnerTeamId: string;
-  teamAScore: number;
-  teamBScore: number;
-  mvpName: string;
 };
 
 export type SimulatedSeries = {
@@ -119,7 +114,7 @@ export type SimulatedSeries = {
   winnerTeamId: string;
   teamAWins: number;
   teamBWins: number;
-  games: SeriesGameSummary[];
+  games: SeriesGame[];
   decidingGame: SimulatedGame;
   mvp: PlayerBoxScore;
   explanation: string;

@@ -220,7 +220,9 @@ function FaceoffCard({
         type="button"
         onClick={onClear}
         aria-label={`Clear ${placeholder.toLowerCase()}`}
-        className="!absolute right-2.5 top-2.5 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/45 text-white/85 transition hover:bg-black/70 hover:text-white"
+        className={`!absolute bottom-2.5 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/45 text-white/70 transition hover:bg-black/70 hover:text-white ${
+          side === "away" ? "left-2.5" : "right-2.5"
+        }`}
       >
         <X className="h-3.5 w-3.5" aria-hidden="true" />
       </button>

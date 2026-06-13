@@ -5,6 +5,7 @@ import { MatchupFactors } from "@/components/MatchupFactors";
 import { MvpCard } from "@/components/MvpCard";
 import { Scoreboard } from "@/components/Scoreboard";
 import { SeriesSummary } from "@/components/SeriesSummary";
+import { SeriesBoxScores } from "@/components/SeriesBoxScores";
 import { TeamRadarChart } from "@/components/TeamRadarChart";
 import { buildShareSummary } from "@/lib/shareSummary";
 import { getSiteOrigin } from "@/lib/siteUrl";
@@ -68,26 +69,33 @@ export default async function ResultPage({ params }: ResultPageProps) {
   }
 
   const result = simulation.result;
-  const game = result.type === "single_game" ? result : result.decidingGame;
   const shareOrigin = getSiteOrigin();
+  const isSeries = result.type === "best_of_7";
 
   return (
     <main>
       <Scoreboard result={result} shareOrigin={shareOrigin} simulationId={id} />
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {result.type === "best_of_7" ? <div className="mb-5"><SeriesSummary series={result} /></div> : null}
+
         <div className="grid min-w-0 gap-5 lg:grid-cols-[340px_1fr] lg:items-stretch">
           <div className="flex h-full min-w-0 flex-col justify-between gap-5">
-            <MvpCard mvp={result.mvp} />
+            <MvpCard mvp={result.mvp} averaged={isSeries} />
             <MatchupFactors factors={result.matchupFactors} teams={[result.teamA, result.teamB]} />
           </div>
           <div className="min-w-0 space-y-5">
-            <BoxScoreTable team={result.teamA} players={game.teamABoxScore} />
-            <BoxScoreTable team={result.teamB} players={game.teamBBoxScore} />
+            {result.type === "best_of_7" ? (
+              <SeriesBoxScores series={result} />
+            ) : (
+              <>
+                <BoxScoreTable team={result.teamA} players={result.teamABoxScore} />
+                <BoxScoreTable team={result.teamB} players={result.teamBBoxScore} />
+              </>
+            )}
           </div>
         </div>
 
         <div className="mt-3 min-w-0 space-y-5">
-          {result.type === "best_of_7" ? <SeriesSummary series={result} /> : null}
           <TeamRadarChart teamA={result.teamA} teamB={result.teamB} />
         </div>
       </section>

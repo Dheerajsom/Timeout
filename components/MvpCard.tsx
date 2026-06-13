@@ -1,7 +1,7 @@
 import { Award } from "lucide-react";
 import type { PlayerBoxScore } from "@/types/simulation";
 
-export function MvpCard({ mvp }: { mvp: PlayerBoxScore }) {
+export function MvpCard({ mvp, averaged = false }: { mvp: PlayerBoxScore; averaged?: boolean }) {
   const scoringImpact = clampMetric((mvp.points / 45) * 100);
   const floorImpact = clampMetric(((mvp.assists * 4 + mvp.rebounds * 2.2) / 78) * 100);
   const disruptionImpact = clampMetric((((mvp.steals + mvp.blocks) * 11 + Math.max(mvp.plusMinus, 0) * 1.4) / 72) * 100);
@@ -25,7 +25,7 @@ export function MvpCard({ mvp }: { mvp: PlayerBoxScore }) {
           </div>
           <div className="mt-5 text-2xl font-black leading-8 text-white sm:text-3xl sm:leading-9">{mvp.name}</div>
           <div className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-amber-100/72">
-            {fieldGoalLabel} FG · {plusMinusLabel} +/-
+            {fieldGoalLabel} FG · {plusMinusLabel} +/-{averaged ? " · per game" : ""}
           </div>
         </div>
 
