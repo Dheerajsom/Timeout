@@ -489,6 +489,14 @@ const teamInitialsByFranchise: Record<string, string> = {
   "Toronto Raptors": "TOR",
   "Utah Jazz": "UTA",
   "Washington Wizards": "WAS",
+  "Washington Bullets": "WSB",
+  "New Jersey Nets": "NJN",
+  "San Diego Clippers": "SDC",
+  "Kansas City Kings": "KCK",
+  "Vancouver Grizzlies": "VAN",
+  "Charlotte Bobcats": "CHA",
+  "New Orleans Hornets": "NOH",
+  "New Orleans/Oklahoma City Hornets": "NOK",
 };
 
 function IdleSlot({ index }: { index: number }) {
@@ -512,14 +520,31 @@ function EmptyPanel({ label }: { label: string }) {
   );
 }
 
+// With ~1,300 teams in the pool, a flat random draw almost always surfaces obscure
+// also-rans. Weight the draw toward stronger, star-driven squads (more fun matchups)
+// while keeping every team reachable via the floor.
+function teamWeight(team: Team) {
+  const games = team.wins + team.losses;
+  const winShare = games > 0 ? team.wins / games : 0.5;
+  return Math.max(0.15, winShare ** 1.5 * (team.starPower / 100));
+}
+
 function drawTeams(pool: Team[], count: number) {
   const copy = [...pool];
+  const weights = copy.map(teamWeight);
   const drawn: Team[] = [];
 
   while (drawn.length < count && copy.length) {
-    const index = Math.floor(Math.random() * copy.length);
-    const [team] = copy.splice(index, 1);
-    drawn.push(team);
+    let total = 0;
+    for (const weight of weights) total += weight;
+
+    let threshold = Math.random() * total;
+    let index = 0;
+    while (index < copy.length - 1 && (threshold -= weights[index]) > 0) index += 1;
+
+    drawn.push(copy[index]);
+    copy.splice(index, 1);
+    weights.splice(index, 1);
   }
 
   return drawn;
