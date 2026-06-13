@@ -78,8 +78,8 @@ export default async function ResultPage({ params }: ResultPageProps) {
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {result.type === "best_of_7" ? <div className="mb-5"><SeriesSummary series={result} /></div> : null}
 
-        <div className="grid min-w-0 gap-5 lg:grid-cols-[340px_1fr] lg:items-stretch">
-          <div className="flex h-full min-w-0 flex-col justify-between gap-5">
+        <div className="grid min-w-0 gap-5 lg:grid-cols-[340px_1fr] lg:items-start">
+          <div className="flex min-w-0 flex-col gap-5">
             <MvpCard mvp={result.mvp} averaged={isSeries} />
             <MatchupFactors factors={result.matchupFactors} teams={[result.teamA, result.teamB]} />
           </div>
