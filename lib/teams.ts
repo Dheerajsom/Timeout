@@ -1,5 +1,6 @@
 import type { Player, Team } from "@/types/simulation";
 import { modernRosterPlayers } from "@/lib/modernRosters";
+import { historicalTeamInputs } from "@/lib/historicalTeams";
 
 type PlayerTuple = [
   string,
@@ -2242,11 +2243,17 @@ const modernSeasonTeamSeeds = recentTeamSeeds.flatMap((baseTeam) =>
   modernSeasonStarts.map((startYear) => makeModernSeasonTeam(baseTeam, startYear)),
 );
 
+// Every regular-season team from 1979-80 through 2013-14 (auto-generated from real
+// roster + game-result data). Hand-authored marquee seasons take priority on a
+// season|franchise collision, so the deep historical pool only fills the gaps.
+const historicalSeasonTeamSeeds = historicalTeamInputs.map(makeRecentTeam);
+
 const exactSeasonKeys = new Set([...teamSeeds, ...recentTeamSeeds].map(getSeasonFranchiseKey));
 const allTeamSeeds = [
   ...teamSeeds,
   ...recentTeamSeeds,
   ...modernSeasonTeamSeeds.filter((team) => !exactSeasonKeys.has(getSeasonFranchiseKey(team))),
+  ...historicalSeasonTeamSeeds.filter((team) => !exactSeasonKeys.has(getSeasonFranchiseKey(team))),
 ];
 
 function makeModernSeasonTeam(baseTeam: TeamInput, startYear: number): TeamInput {

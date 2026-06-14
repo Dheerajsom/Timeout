@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronRight, Loader2, Search, Swords, X } from "lucide-react";
+import { Check, Loader2, Search, Swords, X } from "lucide-react";
 import { getTeamColors } from "@/lib/teamColors";
 import { modeOptions } from "@/lib/simulation/constants";
 import { saveRoundHistory, type SimulationPayload } from "@/lib/roundHistory";
@@ -17,6 +17,7 @@ export function CustomMatchup({ teams }: { teams: Team[] }) {
   const [mode, setMode] = useState<SimulationMode>("single_game");
   const [isSimulating, setIsSimulating] = useState(false);
   const [error, setError] = useState("");
+  const [activePicker, setActivePicker] = useState<"home" | "away">("home");
 
   const teamA = teams.find((team) => team.id === teamAId) ?? null;
   const teamB = teams.find((team) => team.id === teamBId) ?? null;
@@ -128,16 +129,36 @@ export function CustomMatchup({ teams }: { teams: Team[] }) {
         {error ? <p className="mt-3 text-center text-sm font-semibold text-orange-300">{error}</p> : null}
       </section>
 
-      <section className="relative mx-auto mt-4 grid max-w-7xl items-start gap-4 sm:mt-6 sm:gap-5 lg:grid-cols-2">
+      {/* Mobile picker switch — one box at a time so each gets the full width */}
+      <div className="mx-auto mt-5 flex max-w-7xl items-center gap-1 rounded-md border border-white/18 bg-neutral-950/95 p-1 sm:mt-6 lg:hidden">
+        <PickerTab
+          accent="home"
+          label="Your squad"
+          active={activePicker === "home"}
+          filled={Boolean(teamA)}
+          onClick={() => setActivePicker("home")}
+        />
+        <PickerTab
+          accent="away"
+          label="Opponent"
+          active={activePicker === "away"}
+          filled={Boolean(teamB)}
+          onClick={() => setActivePicker("away")}
+        />
+      </div>
+
+      <section className="relative mx-auto mt-3 max-w-7xl lg:mt-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-5">
         <SquadPicker
           title="Your squad"
           accent="home"
           teams={teams}
           selectedId={teamAId}
           excludedId={teamBId}
+          className={activePicker === "home" ? "" : "hidden lg:block"}
           onSelect={(id) => {
             setTeamAId(id);
             setError("");
+            setActivePicker("away");
           }}
         />
         <SquadPicker
@@ -146,6 +167,7 @@ export function CustomMatchup({ teams }: { teams: Team[] }) {
           teams={teams}
           selectedId={teamBId}
           excludedId={teamAId}
+          className={activePicker === "away" ? "" : "hidden lg:block"}
           onSelect={(id) => {
             setTeamBId(id);
             setError("");
@@ -180,6 +202,42 @@ export function CustomMatchup({ teams }: { teams: Team[] }) {
         </div>
       </div>
     </main>
+  );
+}
+
+function PickerTab({
+  accent,
+  label,
+  active,
+  filled,
+  onClick,
+}: {
+  accent: "home" | "away";
+  label: string;
+  active: boolean;
+  filled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`inline-flex h-11 flex-1 items-center justify-center gap-2 rounded text-xs font-black uppercase tracking-[0.1em] transition ${
+        active
+          ? "bg-orange-500 text-white shadow-[0_8px_22px_rgba(255,107,0,0.3)]"
+          : "text-neutral-300 hover:bg-neutral-900 hover:text-white"
+      }`}
+    >
+      <span
+        aria-hidden="true"
+        className={`h-2.5 w-2.5 rounded-full ${accent === "home" ? "bg-orange-400" : "bg-sky-400"} ${
+          active ? "ring-2 ring-white/70" : ""
+        }`}
+      />
+      {label}
+      {filled ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : null}
+    </button>
   );
 }
 
@@ -255,6 +313,7 @@ function SquadPicker({
   selectedId,
   excludedId,
   onSelect,
+  className = "",
 }: {
   title: string;
   accent: "home" | "away";
@@ -262,6 +321,7 @@ function SquadPicker({
   selectedId: string;
   excludedId: string;
   onSelect: (id: string) => void;
+  className?: string;
 }) {
   const [search, setSearch] = useState("");
   const [decade, setDecade] = useState("all");
@@ -276,14 +336,18 @@ function SquadPicker({
   }, [teams]);
 
   const query = search.trim().toLowerCase();
-  const results = teams.filter((team) => {
+  const matches = teams.filter((team) => {
     if (decade !== "all" && decadeOf(team) !== decade) return false;
     if (query && !`${team.season} ${team.franchise}`.toLowerCase().includes(query)) return false;
     return true;
   });
+  // The full pool is ~1,300 teams; cap the rendered list and nudge users to filter.
+  const visibleLimit = 150;
+  const results = matches.slice(0, visibleLimit);
+  const hiddenCount = matches.length - results.length;
 
   return (
-    <div className="rounded-lg border border-white/18 bg-neutral-950/95 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:p-5">
+    <div className={`min-w-0 rounded-lg border border-white/18 bg-neutral-950/95 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:p-5 ${className}`}>
       <div className="mb-4 flex items-center justify-center gap-2 text-center">
         <span
           className={`h-2.5 w-2.5 rounded-full ${accent === "home" ? "bg-orange-400" : "bg-sky-400"}`}
@@ -367,6 +431,11 @@ function SquadPicker({
             No teams found.
           </div>
         )}
+        {hiddenCount > 0 ? (
+          <div className="rounded-md border border-dashed border-white/15 bg-neutral-900 p-3 text-center text-xs font-semibold text-neutral-400 sm:col-span-2">
+            +{hiddenCount} more — search a team or pick an era to narrow it down.
+          </div>
+        ) : null}
       </div>
     </div>
   );

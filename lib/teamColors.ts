@@ -87,6 +87,16 @@ const colorsByFranchise: Record<string, TeamColors> = {
   "Toronto Raptors": { primary: "#ce1141", secondary: "#111111", accent: "#a1a1a4" },
   "Utah Jazz": { primary: "#002b5c", secondary: "#f9a01b", accent: "#00471b" },
   "Washington Wizards": { primary: "#002b5c", secondary: "#e31837", accent: "#c4ced4" },
+  // Historical franchises (1979-80 → 2013-14 pool)
+  "Seattle SuperSonics": { primary: "#00653a", secondary: "#ffc200", accent: "#ffffff" },
+  "Washington Bullets": { primary: "#002b5c", secondary: "#e31837", accent: "#c4ced4" },
+  "New Jersey Nets": { primary: "#002a60", secondary: "#cd1041", accent: "#bec0c2" },
+  "San Diego Clippers": { primary: "#c8102e", secondary: "#1d428a", accent: "#f9a01b" },
+  "Kansas City Kings": { primary: "#1d428a", secondary: "#c8102e", accent: "#ffffff" },
+  "Vancouver Grizzlies": { primary: "#00778b", secondary: "#1d1160", accent: "#bc7844" },
+  "Charlotte Bobcats": { primary: "#f9423a", secondary: "#1d1160", accent: "#bec0c2" },
+  "New Orleans Hornets": { primary: "#1d1160", secondary: "#00788c", accent: "#b4975a" },
+  "New Orleans/Oklahoma City Hornets": { primary: "#1d1160", secondary: "#00788c", accent: "#b4975a" },
 };
 
 export function getTeamColors(team: Team): TeamColors {

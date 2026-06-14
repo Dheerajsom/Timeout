@@ -499,6 +499,14 @@ const teamInitialsByFranchise: Record<string, string> = {
   "Toronto Raptors": "TOR",
   "Utah Jazz": "UTA",
   "Washington Wizards": "WAS",
+  "Washington Bullets": "WSB",
+  "New Jersey Nets": "NJN",
+  "San Diego Clippers": "SDC",
+  "Kansas City Kings": "KCK",
+  "Vancouver Grizzlies": "VAN",
+  "Charlotte Bobcats": "CHA",
+  "New Orleans Hornets": "NOH",
+  "New Orleans/Oklahoma City Hornets": "NOK",
 };
 
 function IdleSlot({ index }: { index: number }) {
@@ -524,6 +532,7 @@ function EmptyPanel({ label }: { label: string }) {
 
 function drawTeams(pool: Team[], count: number, weights: Record<string, number> = {}) {
   const copy = [...pool];
+  const weights = copy.map(teamWeight);
   const drawn: Team[] = [];
 
   while (drawn.length < count && copy.length) {

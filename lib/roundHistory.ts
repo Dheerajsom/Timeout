@@ -39,15 +39,24 @@ export function readRoundHistory(): RoundHistoryEntry[] {
 
 export function saveRoundHistory(userTeam: Team, opponentTeam: Team, payload: SimulationPayload) {
   const result = payload.result;
-  const game = result.type === "single_game" ? result : result.decidingGame;
   const userIsTeamA = result.teamA.id === userTeam.id;
+  // For a series, show the series record (e.g. 4-2); for a single game, the points.
+  let userScore: number;
+  let opponentScore: number;
+  if (result.type === "best_of_7") {
+    userScore = userIsTeamA ? result.teamAWins : result.teamBWins;
+    opponentScore = userIsTeamA ? result.teamBWins : result.teamAWins;
+  } else {
+    userScore = userIsTeamA ? result.teamAScore : result.teamBScore;
+    opponentScore = userIsTeamA ? result.teamBScore : result.teamAScore;
+  }
   const entry: RoundHistoryEntry = {
     id: payload.simulationId,
     playedAt: new Date().toISOString(),
     userTeam: `${userTeam.season} ${userTeam.franchise}`,
     opponentTeam: `${opponentTeam.season} ${opponentTeam.franchise}`,
-    userScore: userIsTeamA ? game.teamAScore : game.teamBScore,
-    opponentScore: userIsTeamA ? game.teamBScore : game.teamAScore,
+    userScore,
+    opponentScore,
     userWon: result.winnerTeamId === userTeam.id,
     resultUrl: `/result/${payload.simulationId}`,
   };
