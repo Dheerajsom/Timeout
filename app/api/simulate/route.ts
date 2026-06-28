@@ -6,8 +6,16 @@ import { simulateSeries } from "@/lib/simulation/simulateSeries";
 import { saveSimulation } from "@/lib/simulationStore";
 import { simulateRequestSchema } from "@/lib/validators/simulateRequest";
 
+const MAX_SIMULATION_REQUEST_BYTES = 2048;
+
 export async function POST(request: Request) {
-  const parsed = simulateRequestSchema.safeParse(await request.json());
+  const body = await readRequestJson(request);
+
+  if (!body.ok) {
+    return body.response;
+  }
+
+  const parsed = simulateRequestSchema.safeParse(body.value);
 
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid simulation request." }, { status: 400 });
@@ -45,4 +53,34 @@ export async function POST(request: Request) {
     simulationId: simulation.id,
     result,
   });
+}
+
+async function readRequestJson(request: Request) {
+  const contentLength = Number(request.headers.get("content-length"));
+
+  if (Number.isFinite(contentLength) && contentLength > MAX_SIMULATION_REQUEST_BYTES) {
+    return {
+      ok: false as const,
+      response: NextResponse.json({ error: "Simulation request is too large." }, { status: 413 }),
+    };
+  }
+
+  const rawBody = await request.text();
+  const bodyBytes = new TextEncoder().encode(rawBody).byteLength;
+
+  if (bodyBytes > MAX_SIMULATION_REQUEST_BYTES) {
+    return {
+      ok: false as const,
+      response: NextResponse.json({ error: "Simulation request is too large." }, { status: 413 }),
+    };
+  }
+
+  try {
+    return { ok: true as const, value: JSON.parse(rawBody) as unknown };
+  } catch {
+    return {
+      ok: false as const,
+      response: NextResponse.json({ error: "Invalid simulation request." }, { status: 400 }),
+    };
+  }
 }

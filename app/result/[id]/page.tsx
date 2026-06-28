@@ -6,7 +6,7 @@ import { MvpCard } from "@/components/MvpCard";
 import { Scoreboard } from "@/components/Scoreboard";
 import { SeriesSummary } from "@/components/SeriesSummary";
 import { SeriesBoxScores } from "@/components/SeriesBoxScores";
-import { TeamRadarChart } from "@/components/TeamRadarChart";
+import { TeamRadarChartLoader } from "@/components/TeamRadarChartLoader";
 import { buildShareSummary } from "@/lib/shareSummary";
 import { getSiteOrigin } from "@/lib/siteUrl";
 import { getSimulation } from "@/lib/simulationStore";
@@ -96,7 +96,7 @@ export default async function ResultPage({ params }: ResultPageProps) {
         </div>
 
         <div className="mt-3 min-w-0 space-y-5">
-          <TeamRadarChart teamA={result.teamA} teamB={result.teamB} />
+          <TeamRadarChartLoader teamA={result.teamA} teamB={result.teamB} />
         </div>
       </section>
     </main>
