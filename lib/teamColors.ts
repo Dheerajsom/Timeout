@@ -13,6 +13,7 @@ export const defaultTeamColors: TeamColors = {
 };
 
 const colorsById: Record<string, TeamColors> = {
+  "2023-omp-hoopers": { primary: "#00563f", secondary: "#f5c542", accent: "#ffffff" },
   "1967-76ers": { primary: "#ed174c", secondary: "#006bb6", accent: "#ffffff" },
   "1972-lakers": { primary: "#552583", secondary: "#fdb927", accent: "#ffffff" },
   "1983-76ers": { primary: "#ed174c", secondary: "#006bb6", accent: "#ffffff" },

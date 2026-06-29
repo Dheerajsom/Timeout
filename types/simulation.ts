@@ -14,6 +14,7 @@ export type Team = {
   name: string;
   franchise: string;
   season: string;
+  logoUrl?: string;
   wins: number;
   losses: number;
   pace: number;
