@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Barlow_Condensed, Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { Analytics } from "@vercel/analytics/next";
@@ -6,6 +7,13 @@ import { Code2 } from "lucide-react";
 import { MainNav } from "@/components/MainNav";
 import { PublicShareHostRedirect } from "@/components/PublicShareHostRedirect";
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const barlow = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-display",
+});
 
 export const metadata: Metadata = {
   title: "Timeout | NBA Era Matchup Simulator",
@@ -25,49 +33,72 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${barlow.variable}`}>
       <body className="font-sans antialiased">
         <PublicShareHostRedirect />
-        <CourtBackground />
-        <div className="min-h-screen">
-          <header className="relative z-50">
-            <div className="mx-auto flex max-w-7xl flex-col items-center justify-center px-4 pb-1 pt-3 sm:px-6 sm:pb-2 sm:pt-4 lg:px-8">
-              <Link href="/" className="group flex flex-col items-center gap-0">
-                <span className="relative block h-16 w-16 transition duration-200 group-hover:scale-105 sm:h-24 sm:w-24">
+        <ArenaBackground />
+        <div className="flex min-h-screen flex-col">
+          <header className="relative z-50 border-b border-line bg-ink/78 backdrop-blur">
+            <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6 lg:px-8">
+              <Link href="/" className="group flex min-w-0 items-center gap-2.5">
+                <span className="relative block h-9 w-9 shrink-0 transition duration-200 group-hover:scale-105 sm:h-10 sm:w-10">
                   <Image
                     src="/timeout-logo-mark.png"
-                    alt="Timeout"
+                    alt=""
                     fill
                     priority
-                    sizes="96px"
-                    className="object-contain drop-shadow-[0_8px_18px_rgba(28,13,3,0.45)]"
+                    sizes="40px"
+                    className="object-contain drop-shadow-[0_6px_14px_rgba(0,0,0,0.5)]"
                   />
                 </span>
-                <span className="-mt-1 text-center">
-                  <span className="brand-title block text-lg font-black uppercase tracking-normal sm:text-2xl">
+                <span className="min-w-0">
+                  <span className="block font-display text-xl font-extrabold uppercase leading-none tracking-[0.08em] text-white sm:text-2xl">
                     Timeout
                   </span>
-                  <span className="block text-[9px] font-black uppercase tracking-[0.22em] text-orange-100 drop-shadow-[0_2px_0_rgba(124,45,18,0.95)] sm:text-[10px]">
-                    Est. 2026
+                  <span className="mt-0.5 hidden text-[10px] font-bold uppercase tracking-[0.2em] text-muted sm:block">
+                    Cross-era NBA matchup simulator
                   </span>
                 </span>
               </Link>
-              <MainNav />
-              <a
-                href="https://github.com/Dheerajsom/Timeout"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Open Timeout on GitHub"
-                className="absolute right-4 top-3 inline-flex h-10 items-center justify-center gap-2 rounded-md border border-white/20 bg-neutral-950 px-3 text-xs font-black uppercase tracking-normal text-white shadow-[0_14px_36px_rgba(0,0,0,0.28)] transition hover:border-orange-300 hover:bg-orange-500 sm:right-6 sm:top-4 sm:h-11 sm:px-4 lg:right-8"
-              >
-                <Code2 className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">GitHub</span>
-              </a>
+
+              <div className="flex items-center gap-2 sm:gap-3">
+                <MainNav className="hidden md:flex" />
+                <a
+                  href="https://github.com/Dheerajsom/Timeout"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Open Timeout on GitHub"
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-line bg-panel px-3 text-xs font-black uppercase tracking-wide text-white transition hover:border-orange-400/60 hover:bg-raised"
+                >
+                  <Code2 className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden lg:inline">GitHub</span>
+                </a>
+              </div>
+            </div>
+            <div className="border-t border-line md:hidden">
+              <MainNav className="mx-auto flex h-11 max-w-7xl items-center justify-center px-2" />
             </div>
           </header>
-          {children}
-          <footer className="relative z-40 px-4 pb-10 text-center text-xs font-bold uppercase tracking-[0.14em] text-white/85 drop-shadow-[0_2px_0_rgba(0,0,0,0.65)] sm:px-6 sm:pb-6 lg:px-8">
-            Timeout is an independent project and not affiliated with the NBA.
+
+          <div className="flex-1">{children}</div>
+
+          <footer className="relative z-40 border-t border-line bg-ink/70">
+            <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-4 py-6 text-center sm:flex-row sm:justify-between sm:px-6 sm:text-left lg:px-8">
+              <div>
+                <span className="font-display text-lg font-extrabold uppercase tracking-[0.08em] text-white">
+                  Timeout
+                </span>
+                <p className="mt-1 text-xs font-semibold text-muted">
+                  An independent project, not affiliated with the NBA.
+                </p>
+              </div>
+              <nav aria-label="Footer" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-bold uppercase tracking-[0.14em] text-muted">
+                <Link href="/" className="transition hover:text-white">Play</Link>
+                <Link href="/matchup" className="transition hover:text-white">Custom Matchup</Link>
+                <Link href="/teams" className="transition hover:text-white">Team Archive</Link>
+                <Link href="/about" className="transition hover:text-white">About</Link>
+              </nav>
+            </div>
           </footer>
         </div>
         <Analytics />
@@ -76,7 +107,12 @@ export default function RootLayout({
   );
 }
 
-function CourtBackground() {
+/**
+ * Deep arena backdrop: near-black base, a warm broadcast spotlight from the
+ * rafters, faint half-court geometry, and a light grain pass so large dark
+ * areas do not band.
+ */
+function ArenaBackground() {
   return (
     <svg
       aria-hidden="true"
@@ -90,87 +126,59 @@ function CourtBackground() {
         height: "100vh",
         zIndex: -1,
         pointerEvents: "none",
-        background: "#a96830",
+        background: "#0a0d12",
       }}
     >
       <defs>
-        <linearGradient id="courtWood" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stopColor="#d09452" />
-          <stop offset="0.45" stopColor="#c07f42" />
-          <stop offset="1" stopColor="#9c5f2b" />
-        </linearGradient>
-        <pattern id="courtPlanks" width="96" height="900" patternUnits="userSpaceOnUse">
-          <path d="M48 0V900" stroke="#6f3a18" strokeOpacity="0.14" strokeWidth="1.5" />
-          <path d="M96 0V900" stroke="#6f3a18" strokeOpacity="0.18" strokeWidth="1.5" />
-          <path
-            d="M0 120H48M48 290H96M0 470H48M48 640H96M0 810H48"
-            stroke="#fae3b8"
-            strokeOpacity="0.08"
-            strokeWidth="1.5"
-          />
-        </pattern>
-        <radialGradient id="courtSpot" cx="0.5" cy="0.4" r="0.9">
-          <stop offset="0" stopColor="#ffe9c2" stopOpacity="0.2" />
-          <stop offset="0.45" stopColor="#ffdfae" stopOpacity="0.04" />
-          <stop offset="1" stopColor="#2a1304" stopOpacity="0.52" />
+        <radialGradient id="arenaSpot" cx="0.5" cy="-0.12" r="1.05">
+          <stop offset="0" stopColor="#ffb26b" stopOpacity="0.16" />
+          <stop offset="0.32" stopColor="#f97316" stopOpacity="0.055" />
+          <stop offset="0.62" stopColor="#0a0d12" stopOpacity="0" />
         </radialGradient>
-        <linearGradient id="courtTop" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="#1c0d03" stopOpacity="0.5" />
-          <stop offset="0.35" stopColor="#1c0d03" stopOpacity="0.08" />
-          <stop offset="1" stopColor="#1c0d03" stopOpacity="0.2" />
+        <radialGradient id="arenaFloor" cx="0.5" cy="1.18" r="1">
+          <stop offset="0" stopColor="#1b2230" stopOpacity="0.85" />
+          <stop offset="0.55" stopColor="#10141c" stopOpacity="0.4" />
+          <stop offset="1" stopColor="#0a0d12" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="arenaVignette" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#05070a" stopOpacity="0.55" />
+          <stop offset="0.3" stopColor="#05070a" stopOpacity="0" />
+          <stop offset="0.82" stopColor="#05070a" stopOpacity="0" />
+          <stop offset="1" stopColor="#05070a" stopOpacity="0.6" />
         </linearGradient>
+        <filter id="arenaGrain">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+          <feColorMatrix type="saturate" values="0" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.05" />
+          </feComponentTransfer>
+          <feComposite operator="over" in2="SourceGraphic" />
+        </filter>
       </defs>
 
-      <rect width="1440" height="900" fill="url(#courtWood)" />
-      <rect width="1440" height="900" fill="url(#courtPlanks)" />
+      <rect width="1440" height="900" fill="#0a0d12" />
+      <rect width="1440" height="900" fill="url(#arenaFloor)" />
 
-      <g fill="#7c3414">
-        <rect x="40" y="320" width="300" height="260" opacity="0.16" />
-        <rect x="1100" y="320" width="300" height="260" opacity="0.16" />
-        <circle cx="720" cy="450" r="80" opacity="0.12" />
-      </g>
-
+      {/* Half-court geometry, barely there. */}
       <g
         fill="none"
-        stroke="#fdf3e0"
-        strokeOpacity="0.38"
-        strokeWidth="3"
+        stroke="#ffffff"
+        strokeOpacity="0.05"
+        strokeWidth="2"
         strokeLinecap="round"
-        strokeLinejoin="round"
       >
-        <rect x="40" y="40" width="1360" height="820" />
-        <line x1="720" x2="720" y1="40" y2="860" />
-        <circle cx="720" cy="450" r="80" />
-        <circle cx="720" cy="450" r="24" />
-
-        <rect x="40" y="320" width="300" height="260" />
-        <rect x="1100" y="320" width="300" height="260" />
-
-        <path d="M340 355A95 95 0 0 1 340 545" />
-        <path d="M340 355A95 95 0 0 0 340 545" strokeDasharray="9 11" />
-        <path d="M1100 355A95 95 0 0 0 1100 545" />
-        <path d="M1100 355A95 95 0 0 1 1100 545" strokeDasharray="9 11" />
-
-        <path d="M126 410A40 40 0 0 1 126 490" />
-        <path d="M1314 410A40 40 0 0 0 1314 490" />
-        <line x1="110" x2="110" y1="392" y2="508" />
-        <line x1="1330" x2="1330" y1="392" y2="508" />
-
-        <path d="M40 113H170" />
-        <path d="M40 787H170" />
-        <path d="M170 113A340 340 0 0 1 170 787" />
-        <path d="M1400 113H1270" />
-        <path d="M1400 787H1270" />
-        <path d="M1270 113A340 340 0 0 0 1270 787" />
+        <circle cx="720" cy="980" r="360" />
+        <circle cx="720" cy="980" r="120" />
+        <line x1="0" x2="1440" y1="620" y2="620" strokeOpacity="0.035" />
+        <path d="M160 900V705a120 120 0 0 1 120-120h880a120 120 0 0 1 120 120v195" strokeOpacity="0.04" />
+      </g>
+      <g fill="none" stroke="#f97316" strokeOpacity="0.07" strokeWidth="2">
+        <circle cx="720" cy="980" r="240" />
       </g>
 
-      <g fill="none" stroke="#ff8c42" strokeOpacity="0.5" strokeWidth="3">
-        <circle cx="126" cy="450" r="11" />
-        <circle cx="1314" cy="450" r="11" />
-      </g>
-
-      <rect width="1440" height="900" fill="url(#courtSpot)" />
-      <rect width="1440" height="900" fill="url(#courtTop)" />
+      <rect width="1440" height="900" fill="url(#arenaSpot)" />
+      <rect width="1440" height="900" fill="url(#arenaVignette)" />
+      <rect width="1440" height="900" filter="url(#arenaGrain)" opacity="0.5" fill="transparent" />
     </svg>
   );
 }

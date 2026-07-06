@@ -37,7 +37,11 @@ export function readRoundHistory(): RoundHistoryEntry[] {
   }
 }
 
-export function saveRoundHistory(userTeam: Team, opponentTeam: Team, payload: SimulationPayload) {
+export function saveRoundHistory(
+  userTeam: Pick<Team, "id" | "season" | "franchise">,
+  opponentTeam: Pick<Team, "id" | "season" | "franchise">,
+  payload: SimulationPayload,
+) {
   const result = payload.result;
   const userIsTeamA = result.teamA.id === userTeam.id;
   // For a series, show the series record (e.g. 4-2); for a single game, the points.

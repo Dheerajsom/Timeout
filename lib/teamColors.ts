@@ -98,6 +98,6 @@ const colorsByFranchise: Record<string, TeamColors> = {
   "New Orleans/Oklahoma City Hornets": { primary: "#1d1160", secondary: "#00788c", accent: "#b4975a" },
 };
 
-export function getTeamColors(team: Team): TeamColors {
+export function getTeamColors(team: Pick<Team, "id" | "franchise">): TeamColors {
   return colorsById[team.id] ?? colorsByFranchise[team.franchise] ?? defaultTeamColors;
 }

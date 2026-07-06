@@ -9,19 +9,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#07080a",
-        panel: "#101318",
-        line: "#242a33",
-        muted: "#cbd5e1",
-        hardwood: "#c78d50",
-        signal: "#ff4f5a",
-        teal: "#26d0b8",
+        ink: "#0a0d12",
+        panel: "#12161d",
+        raised: "#171c24",
+        line: "rgba(255,255,255,0.09)",
+        muted: "#9aa4b2",
+        court: "#f97316",
+        gold: "#fbbf24",
+        win: "#34d399",
+        loss: "#fb7185",
       },
       boxShadow: {
-        glow: "0 0 60px rgba(38, 208, 184, 0.14)",
+        stage: "0 24px 80px rgba(0,0,0,0.45)",
+        cta: "0 10px 30px rgba(249,115,22,0.28)",
       },
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: [
+          "var(--font-display)",
+          "Barlow Condensed",
+          "Arial Narrow",
+          "ui-sans-serif",
+          "sans-serif",
+        ],
       },
     },
   },

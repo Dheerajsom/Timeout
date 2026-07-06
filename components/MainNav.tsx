@@ -2,38 +2,36 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Dices, Swords } from "lucide-react";
 
 const tabs = [
-  { href: "/", label: "Spin Mode", icon: Dices },
-  { href: "/matchup", label: "Custom Matchup", icon: Swords },
+  { href: "/", label: "Play", shortLabel: "Play" },
+  { href: "/matchup", label: "Custom Matchup", shortLabel: "Matchup" },
+  { href: "/teams", label: "Teams", shortLabel: "Teams" },
+  { href: "/about", label: "About", shortLabel: "About" },
 ];
 
-export function MainNav() {
+export function MainNav({ className = "" }: { className?: string }) {
   const pathname = usePathname();
 
   return (
-    <nav
-      aria-label="Game modes"
-      className="mx-auto mt-2 flex w-fit items-center gap-1 rounded-md border border-white/20 bg-neutral-950 p-1 shadow-[0_14px_36px_rgba(0,0,0,0.28)]"
-    >
+    <nav aria-label="Primary" className={`items-center gap-1 ${className}`}>
       {tabs.map((tab) => {
-        const isActive = pathname === tab.href;
-        const Icon = tab.icon;
+        const isActive =
+          tab.href === "/" ? pathname === "/" : pathname.startsWith(tab.href);
 
         return (
           <Link
             key={tab.href}
             href={tab.href}
             aria-current={isActive ? "page" : undefined}
-            className={`inline-flex h-9 items-center justify-center gap-2 rounded px-4 text-xs font-black uppercase tracking-normal transition sm:text-sm ${
+            className={`relative inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md px-3 text-xs font-black uppercase tracking-[0.12em] transition sm:px-3.5 ${
               isActive
-                ? "bg-orange-500 text-white shadow-[0_8px_22px_rgba(255,107,0,0.3)]"
-                : "text-neutral-300 hover:bg-neutral-900 hover:text-white"
+                ? "text-white after:absolute after:inset-x-3 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-orange-500"
+                : "text-muted hover:bg-white/5 hover:text-white"
             }`}
           >
-            <Icon className="h-4 w-4" aria-hidden="true" />
-            {tab.label}
+            <span className="sm:hidden">{tab.shortLabel}</span>
+            <span className="hidden sm:inline">{tab.label}</span>
           </Link>
         );
       })}
