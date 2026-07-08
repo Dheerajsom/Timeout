@@ -25,6 +25,14 @@ a {
   text-decoration: none;
 }
 
+/* Keeps the footer clear of the round stage's fixed bottom action bar (which
+   only renders below the `sm` breakpoint). Toggled on <body> by RoundStage. */
+@media (max-width: 639px) {
+  body.has-mobile-action-bar {
+    padding-bottom: 88px;
+  }
+}
+
 button,
 select,
 input {

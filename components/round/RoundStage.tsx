@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CircleHelp, Play, RotateCcw } from "lucide-react";
-import { drawTeams, type RoundTeam } from "@/lib/round";
+import { drawTeams, getTeamInitials, type RoundTeam } from "@/lib/round";
+import { getTeamColors } from "@/lib/teamColors";
 import { saveRoundHistory, type SimulationPayload } from "@/lib/roundHistory";
 import { MysteryCard } from "@/components/round/MysteryCard";
 import { ProgressTracker } from "@/components/round/ProgressTracker";
@@ -13,35 +14,67 @@ import type { SimulatedGame } from "@/types/simulation";
 
 type Phase = "ready" | "spinning" | "choose" | "versus" | "result";
 
+/**
+ * "normal" is the knowledge game: no ratings, no rosters, and the opponent is
+ * on the board from the jump. "stats" is the scouting-file variant with the
+ * sealed opponent and full rating strips.
+ */
+type GameMode = "normal" | "stats";
+
 const activeRuleset = "modern";
 
 /** Fired after a round is saved so the Recent Matchups section can refresh. */
 export const historyUpdatedEvent = "timeout:history-updated";
 
-const phaseHeadline: Record<Phase, { title: string; sub: string }> = {
-  ready: {
-    title: "Spin three mystery squads.",
-    sub: "Three teams, three eras, one sealed opponent. Trust the squad built to win.",
+const phaseHeadline: Record<GameMode, Record<Phase, { title: string; sub: string }>> = {
+  normal: {
+    ready: {
+      title: "Beat the team on the board.",
+      sub: "Spin three squads and back the one your basketball knowledge says wins. No ratings, no rosters — just names.",
+    },
+    spinning: {
+      title: "Scouting the eras…",
+      sub: "Pulling three squads from the archive.",
+    },
+    choose: {
+      title: "Who beats them?",
+      sub: "The opponent is waiting below. Trust the squad you believe takes them down.",
+    },
+    versus: {
+      title: "The matchup is set.",
+      sub: "No takebacks after the ball goes up.",
+    },
+    result: {
+      title: "",
+      sub: "",
+    },
   },
-  spinning: {
-    title: "Scouting the eras…",
-    sub: "Pulling three squads from the archive.",
-  },
-  choose: {
-    title: "Trust one squad.",
-    sub: "One of these three carries your call. The opponent stays sealed until you commit.",
-  },
-  versus: {
-    title: "The matchup is set.",
-    sub: "No takebacks after the ball goes up.",
-  },
-  result: {
-    title: "",
-    sub: "",
+  stats: {
+    ready: {
+      title: "Spin three mystery squads.",
+      sub: "Three teams, three eras, one sealed opponent. Trust the squad built to win.",
+    },
+    spinning: {
+      title: "Scouting the eras…",
+      sub: "Pulling three squads from the archive.",
+    },
+    choose: {
+      title: "Trust one squad.",
+      sub: "One of these three carries your call. The opponent stays sealed until you commit.",
+    },
+    versus: {
+      title: "The matchup is set.",
+      sub: "No takebacks after the ball goes up.",
+    },
+    result: {
+      title: "",
+      sub: "",
+    },
   },
 };
 
 export function RoundStage({ teams }: { teams: RoundTeam[] }) {
+  const [gameMode, setGameMode] = useState<GameMode>("normal");
   const [phase, setPhase] = useState<Phase>("ready");
   const [slots, setSlots] = useState<RoundTeam[]>([]);
   const [revealedCount, setRevealedCount] = useState(0);
@@ -67,6 +100,24 @@ export function RoundStage({ teams }: { teams: RoundTeam[] }) {
 
   function schedule(callback: () => void, delay: number) {
     timers.current.push(window.setTimeout(callback, delay));
+  }
+
+  function changeMode(nextMode: GameMode) {
+    if (nextMode === gameMode || simulating || runningBack) {
+      return;
+    }
+
+    clearTimers();
+    setGameMode(nextMode);
+    setPhase("ready");
+    setSlots([]);
+    setOpponent(null);
+    setRevealedCount(0);
+    setChosenId("");
+    setLocking(false);
+    setResult(null);
+    setSimulationId("");
+    setError("");
   }
 
   function startRound() {
@@ -148,31 +199,43 @@ export function RoundStage({ teams }: { teams: RoundTeam[] }) {
     }
   }
 
+  const showStats = gameMode === "stats";
+  // Normal mode has no reveal step — the opponent is visible from the start.
+  const progressSteps = showStats
+    ? ["Spin", "Choose", "Reveal", "Simulate", "Result"]
+    : ["Spin", "Choose", "Simulate", "Result"];
   const progressIndex =
     phase === "ready" || phase === "spinning"
       ? 0
       : phase === "choose"
         ? 1
         : phase === "versus"
-          ? simulating
-            ? 3
-            : 2
-          : 4;
+          ? showStats && !simulating
+            ? 2
+            : progressSteps.length - 2
+          : progressSteps.length - 1;
 
-  const headline = phaseHeadline[phase];
+  const headline = phaseHeadline[gameMode][phase];
   const showMobileBar = phase === "versus" || phase === "result";
 
+  // Reserve space at the end of the document (footer included) while the
+  // fixed bottom action bar is mounted, so it never covers the footer links.
+  useEffect(() => {
+    if (!showMobileBar) {
+      return;
+    }
+    document.body.classList.add("has-mobile-action-bar");
+    return () => document.body.classList.remove("has-mobile-action-bar");
+  }, [showMobileBar]);
+
   return (
-    <section
-      aria-label="Timeout round"
-      className={`relative mx-auto w-full max-w-6xl ${showMobileBar ? "pb-20 sm:pb-0" : ""}`}
-    >
+    <section aria-label="Timeout round" className="relative mx-auto w-full max-w-6xl">
       <div className="overflow-hidden rounded-xl border border-white/12 bg-panel/90 shadow-stage backdrop-blur-sm">
         <div aria-hidden="true" className="h-1 w-full bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600" />
 
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/8 px-4 py-3 sm:px-6">
-          <span className="eyebrow text-white/80">Round stage</span>
-          <ProgressTracker current={progressIndex} />
+          <ModeToggle mode={gameMode} disabled={simulating || runningBack || locking} onChange={changeMode} />
+          <ProgressTracker current={progressIndex} steps={progressSteps} />
           {phase !== "ready" ? (
             <button
               type="button"
@@ -237,7 +300,7 @@ export function RoundStage({ teams }: { teams: RoundTeam[] }) {
               <div className="grid gap-3 md:grid-cols-3">
                 {[0, 1, 2].map((index) =>
                   phase === "spinning" && revealedCount > index && slots[index] ? (
-                    <SquadCard key={slots[index].id} team={slots[index]} />
+                    <SquadCard key={slots[index].id} team={slots[index]} showStats={showStats} />
                   ) : (
                     <MysteryCard
                       key={index}
@@ -249,7 +312,13 @@ export function RoundStage({ teams }: { teams: RoundTeam[] }) {
                 )}
               </div>
 
-              {phase === "spinning" ? <OpponentTicker state="sealed" /> : null}
+              {phase === "spinning" ? (
+                showStats ? (
+                  <OpponentTicker state="sealed" />
+                ) : opponent ? (
+                  <OpponentBoard team={opponent} />
+                ) : null
+              ) : null}
             </>
           ) : null}
 
@@ -260,6 +329,7 @@ export function RoundStage({ teams }: { teams: RoundTeam[] }) {
                   <SquadCard
                     key={team.id}
                     team={team}
+                    showStats={showStats}
                     revealDelay={index * 90}
                     selected={chosenId === team.id}
                     dimmed={Boolean(chosenId) && chosenId !== team.id}
@@ -268,7 +338,11 @@ export function RoundStage({ teams }: { teams: RoundTeam[] }) {
                   />
                 ))}
               </div>
-              <OpponentTicker state={locking ? "unsealing" : "sealed"} />
+              {showStats ? (
+                <OpponentTicker state={locking ? "unsealing" : "sealed"} />
+              ) : opponent ? (
+                <OpponentBoard team={opponent} />
+              ) : null}
             </>
           ) : null}
 
@@ -276,6 +350,7 @@ export function RoundStage({ teams }: { teams: RoundTeam[] }) {
             <VersusPanel
               user={chosen}
               opponent={opponent}
+              showStats={showStats}
               simulating={simulating}
               error={error}
               onSimulate={() => simulate(false)}
@@ -337,6 +412,82 @@ export function RoundStage({ teams }: { teams: RoundTeam[] }) {
         </div>
       ) : null}
     </section>
+  );
+}
+
+/** Segmented Normal / With Stats switch shown in the stage header. */
+function ModeToggle({
+  mode,
+  disabled,
+  onChange,
+}: {
+  mode: GameMode;
+  disabled: boolean;
+  onChange: (mode: GameMode) => void;
+}) {
+  const options: { value: GameMode; label: string }[] = [
+    { value: "normal", label: "Normal" },
+    { value: "stats", label: "With Stats" },
+  ];
+
+  return (
+    <div
+      role="group"
+      aria-label="Game mode"
+      className="inline-flex items-center gap-0.5 rounded-md border border-white/12 bg-ink/60 p-0.5"
+    >
+      {options.map((option) => {
+        const isActive = mode === option.value;
+        return (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => onChange(option.value)}
+            disabled={disabled}
+            aria-pressed={isActive}
+            className={`inline-flex h-7 items-center whitespace-nowrap rounded px-2.5 text-[10px] font-black uppercase tracking-[0.12em] transition disabled:opacity-50 sm:text-[11px] ${
+              isActive ? "bg-orange-500 text-white shadow-cta" : "text-muted hover:text-white"
+            }`}
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Normal-mode opponent banner: the team to beat, names only — no ratings. */
+function OpponentBoard({ team }: { team: RoundTeam }) {
+  const colors = getTeamColors(team);
+
+  return (
+    <div className="mt-4 overflow-hidden rounded-lg border border-orange-400/30 bg-ink/60">
+      <div
+        aria-hidden="true"
+        className="h-1 w-full"
+        style={{ background: `linear-gradient(90deg, ${colors.primary} 0 62%, ${colors.secondary} 62% 100%)` }}
+      />
+      <div className="flex flex-wrap items-center gap-3 px-4 py-3 sm:px-5">
+        <span
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-xs font-black text-white"
+          style={{ background: colors.primary, boxShadow: `inset 0 0 0 2px ${colors.secondary}` }}
+        >
+          {getTeamInitials(team.franchise)}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-orange-300">
+            The opponent &middot; {team.season} season
+          </div>
+          <div className="truncate font-display text-xl font-bold uppercase leading-7 text-white sm:text-2xl">
+            {team.franchise}
+          </div>
+        </div>
+        <span className="hidden rounded-full border border-white/12 bg-white/5 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white/70 sm:inline-flex">
+          Beat this team
+        </span>
+      </div>
+    </div>
   );
 }
 

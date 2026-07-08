@@ -1,8 +1,14 @@
 import { Check } from "lucide-react";
 
-const steps = ["Spin", "Choose", "Reveal", "Simulate", "Result"];
+const defaultSteps = ["Spin", "Choose", "Reveal", "Simulate", "Result"];
 
-export function ProgressTracker({ current }: { current: number }) {
+export function ProgressTracker({
+  current,
+  steps = defaultSteps,
+}: {
+  current: number;
+  steps?: string[];
+}) {
   return (
     <ol aria-label="Round progress" className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
       {steps.map((step, index) => {

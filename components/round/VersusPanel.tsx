@@ -20,6 +20,7 @@ const comparedStats = [
 export function VersusPanel({
   user,
   opponent,
+  showStats = true,
   simulating,
   error,
   onSimulate,
@@ -28,6 +29,7 @@ export function VersusPanel({
 }: {
   user: RoundTeam;
   opponent: RoundTeam;
+  showStats?: boolean;
   simulating: boolean;
   error: string;
   onSimulate: () => void;
@@ -40,35 +42,37 @@ export function VersusPanel({
   return (
     <div>
       <div className="grid items-stretch gap-3 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4">
-        <TeamSide team={user} role="Your call" enter="left" />
+        <TeamSide team={user} role="Your call" enter="left" showStats={showStats} />
         <div className="flex items-center justify-center py-1">
           <span className="grid h-14 w-14 place-items-center rounded-full border-2 border-orange-400/80 bg-ink font-display text-xl font-bold text-orange-300 shadow-[0_0_28px_rgba(249,115,22,0.35)]">
             VS
           </span>
         </div>
-        <TeamSide team={opponent} role="The opponent" enter="right" />
+        <TeamSide team={opponent} role="The opponent" enter="right" showStats={showStats} />
       </div>
 
-      <div className="mt-4 rounded-lg border border-white/10 bg-ink/60 p-4 sm:p-5">
-        <div className="mb-3 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.16em]">
-          <span className="text-white/80">{getTeamInitials(user.franchise)} &middot; {user.season}</span>
-          <span className="text-muted">Head to head</span>
-          <span className="text-white/80">{opponent.season} &middot; {getTeamInitials(opponent.franchise)}</span>
+      {showStats ? (
+        <div className="mt-4 rounded-lg border border-white/10 bg-ink/60 p-4 sm:p-5">
+          <div className="mb-3 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.16em]">
+            <span className="text-white/80">{getTeamInitials(user.franchise)} &middot; {user.season}</span>
+            <span className="text-muted">Head to head</span>
+            <span className="text-white/80">{opponent.season} &middot; {getTeamInitials(opponent.franchise)}</span>
+          </div>
+          <div className="space-y-2.5">
+            {comparedStats.map((stat, index) => (
+              <CompareRow
+                key={stat.key}
+                label={stat.label}
+                a={user[stat.key]}
+                b={opponent[stat.key]}
+                colorA={userColors.primary}
+                colorB={opponentColors.primary}
+                delay={index * 70}
+              />
+            ))}
+          </div>
         </div>
-        <div className="space-y-2.5">
-          {comparedStats.map((stat, index) => (
-            <CompareRow
-              key={stat.key}
-              label={stat.label}
-              a={user[stat.key]}
-              b={opponent[stat.key]}
-              colorA={userColors.primary}
-              colorB={opponentColors.primary}
-              delay={index * 70}
-            />
-          ))}
-        </div>
-      </div>
+      ) : null}
 
       <div className="mt-5 flex flex-col items-center gap-3">
         <button
@@ -123,10 +127,12 @@ function TeamSide({
   team,
   role,
   enter,
+  showStats,
 }: {
   team: RoundTeam;
   role: string;
   enter: "left" | "right";
+  showStats: boolean;
 }) {
   const colors = getTeamColors(team);
   const alignRight = enter === "right";
@@ -154,19 +160,27 @@ function TeamSide({
         <div className="font-display text-3xl font-bold uppercase leading-9 text-white sm:text-4xl sm:leading-10">
           {team.franchise}
         </div>
-        <div className="mt-1 font-display text-base font-bold tabular-nums text-white/85">
-          {team.wins}&ndash;{team.losses}
-          <span className="ml-2 text-sm text-muted">{formatWinPct(team)}</span>
-          <span className="ml-3 text-sm text-orange-300">{team.overall} OVR</span>
-        </div>
-        <div className="mt-2 text-sm font-semibold leading-5 text-white/85">
-          {team.stars.join(" · ")}
-        </div>
-        <div className="mt-auto pt-3">
-          <span className="inline-flex items-center rounded-full border border-white/12 bg-white/5 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white/75">
-            {team.identity}
-          </span>
-        </div>
+        {showStats ? (
+          <>
+            <div className="mt-1 font-display text-base font-bold tabular-nums text-white/85">
+              {team.wins}&ndash;{team.losses}
+              <span className="ml-2 text-sm text-muted">{formatWinPct(team)}</span>
+              <span className="ml-3 text-sm text-orange-300">{team.overall} OVR</span>
+            </div>
+            <div className="mt-2 text-sm font-semibold leading-5 text-white/85">
+              {team.stars.join(" · ")}
+            </div>
+            <div className="mt-auto pt-3">
+              <span className="inline-flex items-center rounded-full border border-white/12 bg-white/5 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white/75">
+                {team.identity}
+              </span>
+            </div>
+          </>
+        ) : (
+          <div className="mt-auto pt-3 text-xs font-semibold leading-5 text-muted">
+            Scouting files stay closed. The simulation settles it.
+          </div>
+        )}
       </div>
     </div>
   );

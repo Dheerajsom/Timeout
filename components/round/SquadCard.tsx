@@ -7,11 +7,14 @@ export function formatWinPct(team: Pick<RoundTeam, "wins" | "losses">) {
 }
 
 /**
- * Revealed squad card: everything needed to compare three teams at a glance —
- * era, record, rating, stars, identity — plus the trust action.
+ * Revealed squad card. With `showStats` (With Stats mode) it lays out
+ * everything needed to compare three teams — era, record, rating, stars,
+ * identity. Without it (Normal mode) it shows season + franchise only, so the
+ * pick rides on the player's own basketball knowledge.
  */
 export function SquadCard({
   team,
+  showStats = true,
   selected,
   dimmed,
   disabled,
@@ -19,6 +22,7 @@ export function SquadCard({
   onTrust,
 }: {
   team: RoundTeam;
+  showStats?: boolean;
   selected?: boolean;
   dimmed?: boolean;
   disabled?: boolean;
@@ -69,34 +73,42 @@ export function SquadCard({
           </div>
         </div>
 
-        <div className="mt-3 flex items-center justify-between rounded-md border border-white/8 bg-ink/60 px-3 py-2">
-          <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.16em] text-muted">Record</div>
-            <div className="font-display text-lg font-bold tabular-nums text-white">
-              {team.wins}&ndash;{team.losses}
-              <span className="ml-2 text-sm text-muted">{formatWinPct(team)}</span>
+        {showStats ? (
+          <>
+            <div className="mt-3 flex items-center justify-between rounded-md border border-white/8 bg-ink/60 px-3 py-2">
+              <div>
+                <div className="text-[10px] font-black uppercase tracking-[0.16em] text-muted">Record</div>
+                <div className="font-display text-lg font-bold tabular-nums text-white">
+                  {team.wins}&ndash;{team.losses}
+                  <span className="ml-2 text-sm text-muted">{formatWinPct(team)}</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-[10px] font-black uppercase tracking-[0.16em] text-muted">Rating</div>
+                <div className="font-display text-lg font-bold tabular-nums text-orange-300">{team.overall}</div>
+              </div>
             </div>
-          </div>
-          <div className="text-right">
-            <div className="text-[10px] font-black uppercase tracking-[0.16em] text-muted">Rating</div>
-            <div className="font-display text-lg font-bold tabular-nums text-orange-300">{team.overall}</div>
-          </div>
-        </div>
 
-        <div className="mt-3">
-          <div className="text-[10px] font-black uppercase tracking-[0.16em] text-muted">Core</div>
-          <div className="mt-1 space-y-0.5 text-sm font-semibold leading-5 text-white/90">
-            {team.stars.map((star) => (
-              <div key={star} className="truncate">{star}</div>
-            ))}
-          </div>
-        </div>
+            <div className="mt-3">
+              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-muted">Core</div>
+              <div className="mt-1 space-y-0.5 text-sm font-semibold leading-5 text-white/90">
+                {team.stars.map((star) => (
+                  <div key={star} className="truncate">{star}</div>
+                ))}
+              </div>
+            </div>
 
-        <div className="mt-3 flex-1">
-          <span className="inline-flex items-center rounded-full border border-white/12 bg-white/5 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white/75">
-            {team.identity}
-          </span>
-        </div>
+            <div className="mt-3 flex-1">
+              <span className="inline-flex items-center rounded-full border border-white/12 bg-white/5 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white/75">
+                {team.identity}
+              </span>
+            </div>
+          </>
+        ) : (
+          <div className="mt-3 flex flex-1 items-center rounded-md border border-dashed border-white/10 bg-ink/40 px-3 py-3 text-xs font-semibold leading-5 text-muted">
+            No scouting report. What do you remember about this squad?
+          </div>
+        )}
 
         {onTrust ? (
           <button

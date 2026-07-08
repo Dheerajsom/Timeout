@@ -5,17 +5,17 @@ const steps = [
   {
     icon: Dices,
     title: "Spin",
-    copy: "Three mystery squads are pulled from 45 years of NBA seasons.",
+    copy: "Three squads are pulled from 45 years of NBA seasons — with the opponent already on the board.",
   },
   {
     icon: ShieldCheck,
     title: "Trust",
-    copy: "Read the files — record, stars, identity — and back one squad.",
+    copy: "No ratings, no rosters. Back the squad your basketball knowledge says beats them.",
   },
   {
     icon: Swords,
-    title: "Reveal",
-    copy: "The sealed opponent steps out. Now it's a matchup.",
+    title: "With Stats",
+    copy: "Want the scouting files? Flip the mode for records, stars and a sealed opponent.",
   },
   {
     icon: Play,
