@@ -56,6 +56,15 @@ export async function POST(request: Request) {
 }
 
 async function readRequestJson(request: Request) {
+  const mediaType = request.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
+
+  if (mediaType !== "application/json") {
+    return {
+      ok: false as const,
+      response: NextResponse.json({ error: "Content-Type must be application/json." }, { status: 415 }),
+    };
+  }
+
   const contentLength = Number(request.headers.get("content-length"));
 
   if (Number.isFinite(contentLength) && contentLength > MAX_SIMULATION_REQUEST_BYTES) {
@@ -65,7 +74,17 @@ async function readRequestJson(request: Request) {
     };
   }
 
-  const rawBody = await request.text();
+  let rawBody: string;
+
+  try {
+    rawBody = await request.text();
+  } catch {
+    return {
+      ok: false as const,
+      response: NextResponse.json({ error: "Invalid simulation request." }, { status: 400 }),
+    };
+  }
+
   const bodyBytes = new TextEncoder().encode(rawBody).byteLength;
 
   if (bodyBytes > MAX_SIMULATION_REQUEST_BYTES) {

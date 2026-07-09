@@ -8,6 +8,7 @@ import { simulateRequestSchema } from "./validators/simulateRequest";
 
 const dataDir = path.join(process.cwd(), "data");
 const storePath = path.join(dataDir, "simulations.json");
+export const MAX_SIMULATION_ID_LENGTH = 512;
 
 export async function saveSimulation(simulation: SavedSimulation) {
   return {
@@ -17,6 +18,10 @@ export async function saveSimulation(simulation: SavedSimulation) {
 }
 
 export async function getSimulation(id: string) {
+  if (!isSimulationIdWithinLimit(id)) {
+    return null;
+  }
+
   const decoded = decodeSimulationId(id);
   if (decoded) {
     return decoded;
@@ -24,6 +29,10 @@ export async function getSimulation(id: string) {
 
   const simulations = await readSimulations();
   return simulations.find((simulation) => simulation.id === id) ?? null;
+}
+
+function isSimulationIdWithinLimit(id: string) {
+  return id.length > 0 && id.length <= MAX_SIMULATION_ID_LENGTH;
 }
 
 export async function readSimulations(): Promise<SavedSimulation[]> {
