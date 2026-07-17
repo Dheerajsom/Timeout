@@ -102,7 +102,7 @@ export function EraArchive({ eras }: { eras: EraSummary[] }) {
         </div>
         <Link
           href="/teams"
-          className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.14em] text-muted transition hover:text-white"
+          className="inline-flex min-h-11 items-center gap-1.5 px-2 text-xs font-black uppercase tracking-[0.14em] text-muted transition hover:text-white"
         >
           Browse all teams
           <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />

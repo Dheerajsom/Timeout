@@ -31,7 +31,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
     <main>
       <section className="border-b border-white/10 bg-panel">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <Link href="/teams" className="mb-6 inline-flex items-center gap-2 text-sm text-muted hover:text-white">
+          <Link href="/teams" className="mb-3 inline-flex min-h-11 items-center gap-2 text-sm text-muted hover:text-white sm:mb-6">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Teams
           </Link>
@@ -49,8 +49,8 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
           </div>
         </div>
       </section>
-      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_420px] lg:px-8">
-        <div className="space-y-6">
+      <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:grid lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-6 lg:space-y-0 lg:px-8">
+        <div className="min-w-0 space-y-6">
           <div className="rounded-md border border-white/10 bg-panel p-5">
             <h2 className="text-lg font-semibold text-white">Team Ratings</h2>
             <div className="mt-5 space-y-3">
@@ -95,7 +95,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
             </div>
           </div>
         </div>
-        <aside>
+        <aside className="min-w-0">
           <SimulationForm teams={teams} initialTeamAId={team.id} initialTeamBId={opponent.id} />
         </aside>
       </section>

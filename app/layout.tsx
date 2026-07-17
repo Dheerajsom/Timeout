@@ -40,7 +40,7 @@ export default function RootLayout({
         <div className="flex min-h-screen flex-col">
           <header className="relative z-50 border-b border-line bg-ink/78 backdrop-blur">
             <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6 lg:px-8">
-              <Link href="/" className="group flex min-w-0 items-center gap-2.5">
+              <Link href="/" className="group flex min-h-11 min-w-0 items-center gap-2.5">
                 <span className="relative block h-9 w-9 shrink-0 transition duration-200 group-hover:scale-105 sm:h-10 sm:w-10">
                   <Image
                     src="/timeout-logo-mark.png"
@@ -68,7 +68,7 @@ export default function RootLayout({
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Open Timeout on GitHub"
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-line bg-panel px-3 text-xs font-black uppercase tracking-wide text-white transition hover:border-orange-400/60 hover:bg-raised"
+                  className="inline-flex h-11 w-11 items-center justify-center gap-2 rounded-md border border-line bg-panel px-0 text-xs font-black uppercase tracking-wide text-white transition hover:border-orange-400/60 hover:bg-raised lg:w-auto lg:px-3"
                 >
                   <Code2 className="h-4 w-4" aria-hidden="true" />
                   <span className="hidden lg:inline">GitHub</span>
@@ -93,10 +93,10 @@ export default function RootLayout({
                 </p>
               </div>
               <nav aria-label="Footer" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-bold uppercase tracking-[0.14em] text-muted">
-                <Link href="/" className="transition hover:text-white">Play</Link>
-                <Link href="/matchup" className="transition hover:text-white">Custom Matchup</Link>
-                <Link href="/teams" className="transition hover:text-white">Team Archive</Link>
-                <Link href="/about" className="transition hover:text-white">About</Link>
+                <Link href="/" className="inline-flex min-h-11 min-w-11 items-center justify-center transition hover:text-white">Play</Link>
+                <Link href="/matchup" className="inline-flex min-h-11 min-w-11 items-center justify-center transition hover:text-white">Custom Matchup</Link>
+                <Link href="/teams" className="inline-flex min-h-11 min-w-11 items-center justify-center transition hover:text-white">Team Archive</Link>
+                <Link href="/about" className="inline-flex min-h-11 min-w-11 items-center justify-center transition hover:text-white">About</Link>
               </nav>
             </div>
           </footer>

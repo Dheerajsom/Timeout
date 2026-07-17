@@ -241,7 +241,7 @@ export function RoundStage({ teams }: { teams: RoundTeam[] }) {
               type="button"
               onClick={startRound}
               disabled={simulating || runningBack || phase === "spinning"}
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-white/12 px-2.5 text-[11px] font-black uppercase tracking-[0.12em] text-muted transition hover:border-orange-400/60 hover:text-white disabled:opacity-40"
+              className="inline-flex h-11 items-center gap-1.5 rounded-md border border-white/12 px-3 text-[11px] font-black uppercase tracking-[0.12em] text-muted transition hover:border-orange-400/60 hover:text-white disabled:opacity-40"
             >
               <RotateCcw className="h-3 w-3" aria-hidden="true" />
               New round
@@ -289,7 +289,7 @@ export function RoundStage({ teams }: { teams: RoundTeam[] }) {
                   </button>
                   <a
                     href="#how-it-works"
-                    className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.14em] text-muted transition hover:text-white"
+                    className="inline-flex min-h-11 items-center gap-1.5 px-3 text-xs font-black uppercase tracking-[0.14em] text-muted transition hover:text-white"
                   >
                     <CircleHelp className="h-3.5 w-3.5" aria-hidden="true" />
                     How it works
@@ -378,7 +378,7 @@ export function RoundStage({ teams }: { teams: RoundTeam[] }) {
       </div>
 
       {showMobileBar ? (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/12 bg-ink/92 px-4 py-3 backdrop-blur sm:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/12 bg-ink/92 px-4 py-3 backdrop-blur sm:hidden">
           {phase === "versus" ? (
             <button
               type="button"
@@ -445,7 +445,7 @@ function ModeToggle({
             onClick={() => onChange(option.value)}
             disabled={disabled}
             aria-pressed={isActive}
-            className={`inline-flex h-7 items-center whitespace-nowrap rounded px-2.5 text-[10px] font-black uppercase tracking-[0.12em] transition disabled:opacity-50 sm:text-[11px] ${
+            className={`inline-flex h-11 items-center whitespace-nowrap rounded px-3 text-[10px] font-black uppercase tracking-[0.12em] transition disabled:opacity-50 sm:text-[11px] ${
               isActive ? "bg-orange-500 text-white shadow-cta" : "text-muted hover:text-white"
             }`}
           >

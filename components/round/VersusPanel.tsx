@@ -98,7 +98,7 @@ export function VersusPanel({
             type="button"
             onClick={onChangePick}
             disabled={simulating}
-            className="inline-flex items-center gap-1.5 transition hover:text-white disabled:opacity-50"
+            className="inline-flex min-h-11 items-center gap-1.5 px-2 transition hover:text-white disabled:opacity-50"
           >
             <Undo2 className="h-3.5 w-3.5" aria-hidden="true" />
             Change pick
@@ -107,7 +107,7 @@ export function VersusPanel({
             type="button"
             onClick={onNewRound}
             disabled={simulating}
-            className="inline-flex items-center gap-1.5 transition hover:text-white disabled:opacity-50"
+            className="inline-flex min-h-11 items-center gap-1.5 px-2 transition hover:text-white disabled:opacity-50"
           >
             <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
             New round

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Loader2, Search, Swords, X } from "lucide-react";
 import { getTeamColors } from "@/lib/teamColors";
@@ -23,6 +23,11 @@ export function CustomMatchup({ teams }: { teams: Team[] }) {
   const teamB = teams.find((team) => team.id === teamBId) ?? null;
   const sameTeam = Boolean(teamA && teamB && teamA.id === teamB.id);
   const ready = Boolean(teamA && teamB && !sameTeam);
+
+  useEffect(() => {
+    document.body.classList.add("has-mobile-action-bar");
+    return () => document.body.classList.remove("has-mobile-action-bar");
+  }, []);
 
   async function simulateMatchup() {
     if (!teamA || !teamB) {
@@ -176,7 +181,7 @@ export function CustomMatchup({ teams }: { teams: Team[] }) {
       </section>
 
       {/* Mobile sticky action bar */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/15 bg-neutral-950/95 px-4 py-3 shadow-[0_-12px_40px_rgba(0,0,0,0.5)] backdrop-blur sm:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/15 bg-neutral-950/95 px-4 py-3 shadow-[0_-12px_40px_rgba(0,0,0,0.5)] backdrop-blur sm:hidden">
         <div className="flex items-center gap-2">
           <select
             value={mode}
@@ -278,7 +283,7 @@ function FaceoffCard({
         type="button"
         onClick={onClear}
         aria-label={`Clear ${placeholder.toLowerCase()}`}
-        className={`!absolute bottom-2.5 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/45 text-white/70 transition hover:bg-black/70 hover:text-white ${
+        className={`!absolute bottom-2.5 z-10 grid h-11 w-11 place-items-center rounded-full bg-black/45 text-white/70 transition hover:bg-black/70 hover:text-white ${
           side === "away" ? "left-2.5" : "right-2.5"
         }`}
       >
@@ -374,7 +379,7 @@ function SquadPicker({
             key={value}
             type="button"
             onClick={() => setDecade(value)}
-            className={`shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] transition ${
+            className={`min-h-11 shrink-0 rounded-full border px-3 py-2 text-[11px] font-black uppercase tracking-[0.1em] transition ${
               decade === value
                 ? "border-orange-300 bg-orange-500 text-white"
                 : "border-white/15 bg-neutral-900 text-neutral-300 hover:border-orange-300/60 hover:text-white"
