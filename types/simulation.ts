@@ -79,13 +79,20 @@ export type QuarterLine = {
   teamB: number;
 };
 
-export type SimulatedGame = {
-  type: "single_game";
+/** The framing every simulation carries, whatever its mode. */
+type SimulationOutcome = {
   seed: string;
   teamA: Team;
   teamB: Team;
   ruleset: Ruleset;
   winnerTeamId: string;
+  mvp: PlayerBoxScore;
+  explanation: string;
+  matchupFactors: MatchupFactor[];
+};
+
+export type SimulatedGame = SimulationOutcome & {
+  type: "single_game";
   teamAScore: number;
   teamBScore: number;
   quarters: {
@@ -96,29 +103,18 @@ export type SimulatedGame = {
   };
   teamABoxScore: PlayerBoxScore[];
   teamBBoxScore: PlayerBoxScore[];
-  mvp: PlayerBoxScore;
-  explanation: string;
-  matchupFactors: MatchupFactor[];
 };
 
 export type SeriesGame = SimulatedGame & {
   gameNumber: number;
 };
 
-export type SimulatedSeries = {
+export type SimulatedSeries = SimulationOutcome & {
   type: "best_of_7";
-  seed: string;
-  teamA: Team;
-  teamB: Team;
-  ruleset: Ruleset;
-  winnerTeamId: string;
   teamAWins: number;
   teamBWins: number;
   games: SeriesGame[];
   decidingGame: SimulatedGame;
-  mvp: PlayerBoxScore;
-  explanation: string;
-  matchupFactors: MatchupFactor[];
 };
 
 export type SavedSimulation = {

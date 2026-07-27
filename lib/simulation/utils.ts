@@ -5,10 +5,6 @@ export function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-export function round(value: number) {
-  return Math.round(value);
-}
-
 export function splitIntoQuarters(total: number, rng: SeededRng) {
   const weights = [
     0.25 + rng.normal(0, 0.025),
@@ -40,8 +36,4 @@ export function calculateMvpScore(box: Omit<PlayerBoxScore, "mvpScore">) {
     box.blocks * 1.8 -
     box.turnovers * 1.2
   );
-}
-
-export function formatRecord(wins: number, losses: number) {
-  return `${wins}-${losses}`;
 }

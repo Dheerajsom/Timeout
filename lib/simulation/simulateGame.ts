@@ -4,7 +4,7 @@ import { buildMatchupFactors, explainMatchup } from "./explainMatchup";
 import { generateBoxScore } from "./generateBoxScore";
 import { SeededRng } from "./rng";
 import { buildQuarterLines, clamp, splitIntoQuarters } from "./utils";
-import { rulesetModifiers } from "./constants";
+import { rulesetModifiers, type RulesetModifiers } from "./constants";
 
 export function simulateGame({
   teamA,
@@ -23,8 +23,8 @@ export function simulateGame({
   const strengthB = calculateTeamStrength(teamB, teamA, ruleset);
   const averagePace = ((teamA.pace + teamB.pace) / 2 - 84) * 0.42 * rules.paceMultiplier;
 
-  const scoreA = makeScore({ team: teamA, opponent: teamB, strength: strengthA - strengthB, pace: averagePace, rng, ruleset });
-  let scoreB = makeScore({ team: teamB, opponent: teamA, strength: strengthB - strengthA, pace: averagePace, rng, ruleset });
+  const scoreA = makeScore({ team: teamA, opponent: teamB, strength: strengthA - strengthB, pace: averagePace, rng, rules });
+  let scoreB = makeScore({ team: teamB, opponent: teamA, strength: strengthB - strengthA, pace: averagePace, rng, rules });
 
   if (scoreA === scoreB) {
     // Break the tie. Bias upward when already at the score floor so we never dip below it.
@@ -67,16 +67,15 @@ function makeScore({
   strength,
   pace,
   rng,
-  ruleset,
+  rules,
 }: {
   team: Team;
   opponent: Team;
   strength: number;
   pace: number;
   rng: SeededRng;
-  ruleset: Ruleset;
+  rules: RulesetModifiers;
 }) {
-  const rules = rulesetModifiers[ruleset];
   const offenseModifier = (team.offense - opponent.defense) * 0.3;
   const spacingModifier = ((team.spacing * rules.spacingMultiplier - 82) / 100) * 9;
   const rimModifier = (team.rimPressure - opponent.physicality) * 0.08;

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { SimulationForm } from "@/components/SimulationForm";
 import { getTeamById, teams } from "@/lib/teams";
+import { teamSummaries } from "@/lib/teamSummary";
 
 const ratingKeys = [
   "offense",
@@ -96,7 +97,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
           </div>
         </div>
         <aside className="min-w-0">
-          <SimulationForm teams={teams} initialTeamAId={team.id} initialTeamBId={opponent.id} />
+          <SimulationForm teams={teamSummaries} initialTeamAId={team.id} initialTeamBId={opponent.id} />
         </aside>
       </section>
     </main>

@@ -55,23 +55,26 @@ export async function POST(request: Request) {
   });
 }
 
+function rejectRequest(status: number, error: string) {
+  return { ok: false as const, response: NextResponse.json({ error }, { status }) };
+}
+
+const tooLarge = () => rejectRequest(413, "Simulation request is too large.");
+const malformed = () => rejectRequest(400, "Invalid simulation request.");
+
 async function readRequestJson(request: Request) {
   const mediaType = request.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
 
   if (mediaType !== "application/json") {
-    return {
-      ok: false as const,
-      response: NextResponse.json({ error: "Content-Type must be application/json." }, { status: 415 }),
-    };
+    return rejectRequest(415, "Content-Type must be application/json.");
   }
 
+  // Check the advertised length first so an oversized body can be turned away
+  // before it is read into memory.
   const contentLength = Number(request.headers.get("content-length"));
 
   if (Number.isFinite(contentLength) && contentLength > MAX_SIMULATION_REQUEST_BYTES) {
-    return {
-      ok: false as const,
-      response: NextResponse.json({ error: "Simulation request is too large." }, { status: 413 }),
-    };
+    return tooLarge();
   }
 
   let rawBody: string;
@@ -79,27 +82,16 @@ async function readRequestJson(request: Request) {
   try {
     rawBody = await request.text();
   } catch {
-    return {
-      ok: false as const,
-      response: NextResponse.json({ error: "Invalid simulation request." }, { status: 400 }),
-    };
+    return malformed();
   }
 
-  const bodyBytes = new TextEncoder().encode(rawBody).byteLength;
-
-  if (bodyBytes > MAX_SIMULATION_REQUEST_BYTES) {
-    return {
-      ok: false as const,
-      response: NextResponse.json({ error: "Simulation request is too large." }, { status: 413 }),
-    };
+  if (new TextEncoder().encode(rawBody).byteLength > MAX_SIMULATION_REQUEST_BYTES) {
+    return tooLarge();
   }
 
   try {
     return { ok: true as const, value: JSON.parse(rawBody) as unknown };
   } catch {
-    return {
-      ok: false as const,
-      response: NextResponse.json({ error: "Invalid simulation request." }, { status: 400 }),
-    };
+    return malformed();
   }
 }

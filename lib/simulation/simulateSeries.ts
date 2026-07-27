@@ -1,6 +1,25 @@
 import type { PlayerBoxScore, Ruleset, SeriesGame, SimulatedGame, SimulatedSeries, Team } from "@/types/simulation";
 import { simulateGame } from "./simulateGame";
 
+/** Counting stats shown to one decimal as a per-game average. */
+const perGameStats = [
+  "points",
+  "rebounds",
+  "assists",
+  "steals",
+  "blocks",
+  "turnovers",
+  "threesMade",
+  "fieldGoalsMade",
+  "fieldGoalsAttempted",
+] as const;
+
+/** Averages that only read sensibly as whole numbers. */
+const wholeNumberStats = ["minutes", "plusMinus"] as const;
+
+/** Every stat accumulated across the series before averaging. */
+const summedStats = [...perGameStats, ...wholeNumberStats, "mvpScore"] as const satisfies readonly (keyof PlayerBoxScore)[];
+
 function round1(value: number) {
   return Math.round(value * 10) / 10;
 }
@@ -42,46 +61,32 @@ export function simulateSeries({
 
   // Average the winning team's box scores across every game in the series so the
   // MVP card shows per-game averages rather than a running total.
-  const tally = new Map<string, { player: PlayerBoxScore; appearances: number }>();
-  games.forEach((game) => {
+  const totals = new Map<string, { player: PlayerBoxScore; appearances: number }>();
+  for (const game of games) {
     const boxScore = winnerTeamId === teamA.id ? game.teamABoxScore : game.teamBBoxScore;
-    boxScore.forEach((player) => {
-      const existing = tally.get(player.playerId);
+    for (const player of boxScore) {
+      const existing = totals.get(player.playerId);
       if (!existing) {
-        tally.set(player.playerId, { player: { ...player }, appearances: 1 });
-        return;
+        totals.set(player.playerId, { player: { ...player }, appearances: 1 });
+        continue;
       }
       existing.appearances += 1;
-      existing.player.mvpScore += player.mvpScore;
-      existing.player.minutes += player.minutes;
-      existing.player.points += player.points;
-      existing.player.rebounds += player.rebounds;
-      existing.player.assists += player.assists;
-      existing.player.steals += player.steals;
-      existing.player.blocks += player.blocks;
-      existing.player.turnovers += player.turnovers;
-      existing.player.threesMade += player.threesMade;
-      existing.player.fieldGoalsMade += player.fieldGoalsMade;
-      existing.player.fieldGoalsAttempted += player.fieldGoalsAttempted;
-      existing.player.plusMinus += player.plusMinus;
-    });
-  });
+      for (const key of summedStats) {
+        existing.player[key] += player[key];
+      }
+    }
+  }
 
-  const averages = [...tally.values()].map(({ player, appearances }) => ({
-    ...player,
-    mvpScore: player.mvpScore / appearances,
-    minutes: Math.round(player.minutes / appearances),
-    points: round1(player.points / appearances),
-    rebounds: round1(player.rebounds / appearances),
-    assists: round1(player.assists / appearances),
-    steals: round1(player.steals / appearances),
-    blocks: round1(player.blocks / appearances),
-    turnovers: round1(player.turnovers / appearances),
-    threesMade: round1(player.threesMade / appearances),
-    fieldGoalsMade: round1(player.fieldGoalsMade / appearances),
-    fieldGoalsAttempted: round1(player.fieldGoalsAttempted / appearances),
-    plusMinus: Math.round(player.plusMinus / appearances),
-  }));
+  const averages = [...totals.values()].map(({ player, appearances }) => {
+    const averaged = { ...player, mvpScore: player.mvpScore / appearances };
+    for (const key of perGameStats) {
+      averaged[key] = round1(player[key] / appearances);
+    }
+    for (const key of wholeNumberStats) {
+      averaged[key] = Math.round(player[key] / appearances);
+    }
+    return averaged;
+  });
 
   const mvp = averages.reduce((best, player) => (player.mvpScore > best.mvpScore ? player : best), averages[0]);
 

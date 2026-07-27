@@ -4,12 +4,12 @@ import { RoundStage } from "@/components/round/RoundStage";
 import { CrossEraBand, EraArchive, HowItWorks, type EraSummary } from "@/components/home/HomeSections";
 import { RecentMatchups } from "@/components/home/RecentMatchups";
 
-export default function Home() {
-  const roundTeams = teams.map(toRoundTeam);
-  const eras = buildEraSummaries(roundTeams);
-  const seasons = teams.map((team) => Number.parseInt(team.season, 10)).filter(Number.isFinite);
-  const seasonSpan = `${Math.min(...seasons)}–${Math.max(...seasons)}`;
+// The team pool is static, so project it once per process rather than on every render.
+const roundTeams = teams.map(toRoundTeam);
+const eras = buildEraSummaries(roundTeams);
+const seasonSpan = buildSeasonSpan();
 
+export default function Home() {
   return (
     <main className="relative px-4 pb-16 pt-6 sm:px-6 sm:pt-8 lg:px-8">
       <RoundStage teams={roundTeams} />
@@ -19,6 +19,11 @@ export default function Home() {
       <EraArchive eras={eras} />
     </main>
   );
+}
+
+function buildSeasonSpan() {
+  const seasons = teams.map((team) => Number.parseInt(team.season, 10)).filter(Number.isFinite);
+  return `${Math.min(...seasons)}–${Math.max(...seasons)}`;
 }
 
 function buildEraSummaries(roundTeams: RoundTeam[]): EraSummary[] {

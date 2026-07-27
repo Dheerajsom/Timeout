@@ -1,15 +1,14 @@
 import type { Ruleset } from "@/types/simulation";
 
-export const rulesetModifiers: Record<
-  Ruleset,
-  {
-    label: string;
-    spacingMultiplier: number;
-    threePointMultiplier: number;
-    physicalityMultiplier: number;
-    paceMultiplier: number;
-  }
-> = {
+export type RulesetModifiers = {
+  label: string;
+  spacingMultiplier: number;
+  threePointMultiplier: number;
+  physicalityMultiplier: number;
+  paceMultiplier: number;
+};
+
+export const rulesetModifiers: Record<Ruleset, RulesetModifiers> = {
   modern: {
     label: "Modern Physicality",
     spacingMultiplier: 1.08,
@@ -46,11 +45,6 @@ export const rulesetModifiers: Record<
     paceMultiplier: 1,
   },
 };
-
-export const rulesetOptions = Object.entries(rulesetModifiers).map(([value, config]) => ({
-  value: value as Ruleset,
-  label: config.label,
-}));
 
 export const modeOptions = [
   { value: "single_game", label: "Single game" },

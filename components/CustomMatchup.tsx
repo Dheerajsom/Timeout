@@ -6,11 +6,14 @@ import { Check, Loader2, Search, Swords, X } from "lucide-react";
 import { getTeamColors } from "@/lib/teamColors";
 import { modeOptions } from "@/lib/simulation/constants";
 import { saveRoundHistory, type SimulationPayload } from "@/lib/roundHistory";
-import type { SimulationMode, Team } from "@/types/simulation";
+import type { TeamSummary } from "@/lib/teamSummary";
+import type { SimulationMode } from "@/types/simulation";
 
 const activeRuleset = "modern";
+/** The full pool is ~1,300 teams; cap the rendered list and nudge users to filter. */
+const visibleLimit = 150;
 
-export function CustomMatchup({ teams }: { teams: Team[] }) {
+export function CustomMatchup({ teams }: { teams: TeamSummary[] }) {
   const router = useRouter();
   const [teamAId, setTeamAId] = useState("");
   const [teamBId, setTeamBId] = useState("");
@@ -252,7 +255,7 @@ function FaceoffCard({
   placeholder,
   onClear,
 }: {
-  team: Team | null;
+  team: TeamSummary | null;
   side: "home" | "away";
   placeholder: string;
   onClear: () => void;
@@ -305,7 +308,7 @@ function FaceoffCard({
   );
 }
 
-function decadeOf(team: Team) {
+function decadeOf(team: TeamSummary) {
   const year = Number.parseInt(team.season, 10);
   if (Number.isNaN(year)) return null;
   return `${Math.floor(year / 10) * 10}s`;
@@ -322,7 +325,7 @@ function SquadPicker({
 }: {
   title: string;
   accent: "home" | "away";
-  teams: Team[];
+  teams: TeamSummary[];
   selectedId: string;
   excludedId: string;
   onSelect: (id: string) => void;
@@ -341,13 +344,17 @@ function SquadPicker({
   }, [teams]);
 
   const query = search.trim().toLowerCase();
-  const matches = teams.filter((team) => {
-    if (decade !== "all" && decadeOf(team) !== decade) return false;
-    if (query && !`${team.season} ${team.franchise}`.toLowerCase().includes(query)) return false;
-    return true;
-  });
-  // The full pool is ~1,300 teams; cap the rendered list and nudge users to filter.
-  const visibleLimit = 150;
+  // Re-filtering ~1,300 teams on every keystroke is the one hot path here, so
+  // keep it off unrelated re-renders.
+  const matches = useMemo(
+    () =>
+      teams.filter((team) => {
+        if (decade !== "all" && decadeOf(team) !== decade) return false;
+        if (query && !`${team.season} ${team.franchise}`.toLowerCase().includes(query)) return false;
+        return true;
+      }),
+    [teams, decade, query],
+  );
   const results = matches.slice(0, visibleLimit);
   const hiddenCount = matches.length - results.length;
 

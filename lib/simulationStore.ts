@@ -4,11 +4,16 @@ import type { SavedSimulation } from "@/types/simulation";
 import { simulateGame } from "./simulation/simulateGame";
 import { simulateSeries } from "./simulation/simulateSeries";
 import { getTeamPair } from "./teams";
-import { simulateRequestSchema } from "./validators/simulateRequest";
+import { simulateRequestSchema, type SimulateRequest } from "./validators/simulateRequest";
 
-const dataDir = path.join(process.cwd(), "data");
-const storePath = path.join(dataDir, "simulations.json");
+const storePath = path.join(process.cwd(), "data", "simulations.json");
 export const MAX_SIMULATION_ID_LENGTH = 512;
+
+/** Ids minted before simulations became reproducible from the id itself. */
+const legacyIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** A decode only counts once it names two different teams and a replayable seed. */
+type ReplayableRequest = SimulateRequest & { seed: string };
 
 export async function saveSimulation(simulation: SavedSimulation) {
   return {
@@ -27,6 +32,12 @@ export async function getSimulation(id: string) {
     return decoded;
   }
 
+  // Only a legacy id can be in the file store, and reading it parses the whole
+  // JSON — so don't touch disk for ids that could never match.
+  if (!legacyIdPattern.test(id)) {
+    return null;
+  }
+
   const simulations = await readSimulations();
   return simulations.find((simulation) => simulation.id === id) ?? null;
 }
@@ -35,7 +46,7 @@ function isSimulationIdWithinLimit(id: string) {
   return id.length > 0 && id.length <= MAX_SIMULATION_ID_LENGTH;
 }
 
-export async function readSimulations(): Promise<SavedSimulation[]> {
+async function readSimulations(): Promise<SavedSimulation[]> {
   try {
     const raw = await readFile(storePath, "utf8");
     return JSON.parse(raw) as SavedSimulation[];
@@ -75,13 +86,7 @@ function decodeSimulationId(id: string): SavedSimulation | null {
 
   try {
     const raw = Buffer.from(id.slice(4), "base64url").toString("utf8");
-    const parsed = simulateRequestSchema.safeParse(JSON.parse(raw));
-
-    if (!parsed.success || parsed.data.teamAId === parsed.data.teamBId || !parsed.data.seed) {
-      return null;
-    }
-
-    return buildDecodedSimulation(id, { ...parsed.data, seed: parsed.data.seed });
+    return buildDecodedSimulation(id, JSON.parse(raw));
   } catch {
     return null;
   }
@@ -117,31 +122,31 @@ function decodeCleanSimulationId(id: string): SavedSimulation | null {
     return null;
   }
 
-  const parsed = simulateRequestSchema.safeParse({
+  return buildDecodedSimulation(id, {
     teamAId,
     teamBId,
     mode: modeSlug === "game" ? "single_game" : modeSlug === "series" ? "best_of_7" : modeSlug,
     ruleset,
     seed,
   });
+}
+
+function toReplayableRequest(input: unknown): ReplayableRequest | null {
+  const parsed = simulateRequestSchema.safeParse(input);
 
   if (!parsed.success || parsed.data.teamAId === parsed.data.teamBId || !parsed.data.seed) {
     return null;
   }
 
-  return buildDecodedSimulation(id, { ...parsed.data, seed: parsed.data.seed });
+  return { ...parsed.data, seed: parsed.data.seed };
 }
 
-function buildDecodedSimulation(
-  id: string,
-  parsed: {
-    teamAId: string;
-    teamBId: string;
-    mode: "single_game" | "best_of_7";
-    ruleset: "modern" | "physical_90s" | "early_2000s" | "bubble" | "neutral";
-    seed: string;
-  },
-) {
+function buildDecodedSimulation(id: string, input: unknown): SavedSimulation | null {
+  const parsed = toReplayableRequest(input);
+  if (!parsed) {
+    return null;
+  }
+
   const pair = getTeamPair(parsed.teamAId, parsed.teamBId);
   if (!pair) {
     return null;

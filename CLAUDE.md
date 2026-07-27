@@ -9,8 +9,7 @@ best-of-7 series. Built with **Next.js (App Router) + React + TypeScript + Tailw
 npm run dev      # start dev server (Turbopack) on http://localhost:3000
 npm run build    # production build
 npm run start    # serve the production build
-npm run lint     # next lint
-npm run test     # vitest run (no test files exist yet)
+npm run test     # vitest run
 ```
 
 There is no separate type-check script; use `npx tsc --noEmit` to type-check.
@@ -34,6 +33,12 @@ Team data lives in `lib/teams.ts` (+ `lib/modernRosters.ts`); team rating shape 
 `types/simulation.ts` (`Team`, `Player`, box-score and result types). Team colors come from
 `lib/teamColors.ts`.
 
+**Never pass the full `Team[]` to a client component.** The pool is ~1,300 teams with complete
+rosters, so serializing it across a client boundary adds megabytes to the RSC payload (it once made
+`/matchup` a 4 MB document). Use a slimmed projection instead — `lib/teamSummary.ts` (`TeamSummary`,
+for pickers) or `lib/round.ts` (`RoundTeam`, for the round stage) — and simulate by id via
+`POST /api/simulate`. Both projections are precomputed at module scope; keep them that way.
+
 ## Routes & key components
 
 - `app/page.tsx` — "Spin Mode" (random matchup wheel).
@@ -42,7 +47,7 @@ Team data lives in `lib/teams.ts` (+ `lib/modernRosters.ts`); team rating shape 
 - `app/share/[id]/` — shareable result page + OpenGraph image.
 - `app/teams/`, `app/about/` — supporting pages.
 - `components/MainNav.tsx` — top segmented nav (Spin Mode / Custom Matchup), in `app/layout.tsx`.
-- Result UI: `Scoreboard`, `BoxScoreTable`, `QuarterTable`, `MvpCard`, `MatchupFactors`,
+- Result UI: `Scoreboard`, `BoxScoreTable`, `MvpCard`, `MatchupFactors`,
   `SeriesSummary`, `SeriesBoxScores`, `TeamRadarChart`.
 
 ## Styling conventions (read before editing layout)

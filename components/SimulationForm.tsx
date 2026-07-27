@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dices, Loader2, RotateCcw } from "lucide-react";
-import type { SimulationMode, Team } from "@/types/simulation";
+import type { SimulationMode } from "@/types/simulation";
 import { modeOptions } from "@/lib/simulation/constants";
+import type { TeamSummary } from "@/lib/teamSummary";
 import { TeamSelect } from "./TeamSelect";
 
 export function SimulationForm({
@@ -12,7 +13,7 @@ export function SimulationForm({
   initialTeamAId,
   initialTeamBId,
 }: {
-  teams: Team[];
+  teams: TeamSummary[];
   initialTeamAId?: string;
   initialTeamBId?: string;
 }) {

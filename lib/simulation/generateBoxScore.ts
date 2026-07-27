@@ -1,7 +1,14 @@
-import type { PlayerBoxScore, Ruleset, Team } from "@/types/simulation";
+import type { Player, PlayerBoxScore, Ruleset, Team } from "@/types/simulation";
 import { rulesetModifiers } from "./constants";
 import { SeededRng } from "./rng";
 import { calculateMvpScore, clamp } from "./utils";
+
+/** A player plus the shot share they drew for this particular game. */
+type GameProfile = {
+  player: Player;
+  index: number;
+  shotWeight: number;
+};
 
 export function generateBoxScore({
   team,
@@ -19,7 +26,7 @@ export function generateBoxScore({
   rng: SeededRng;
 }) {
   const rules = rulesetModifiers[ruleset];
-  const gameProfiles = team.players.map((player, index) => {
+  const gameProfiles: GameProfile[] = team.players.map((player, index) => {
     const baseShotWeight = player.minutes * (player.usage / 100) * (player.scoring / 100);
     const roleVolatility = index < 2 ? 0.28 : index < 5 ? 0.42 : 0.32;
     const coldNight = index < 2 && rng.next() < 0.24 ? rng.between(0.62, 0.88) : 1;
@@ -37,18 +44,23 @@ export function generateBoxScore({
     return Math.max(0, Math.round((teamScore * shotWeight) / totalShotWeight + noise));
   });
 
+  // Nudge individual scoring lines one point at a time until they add up to the
+  // team total. The deficit only ever shrinks toward zero, so its sign — and with
+  // it the rotation filter and the weighting mode — is fixed for the whole loop.
   let pointDelta = teamScore - playerPoints.reduce((acc, points) => acc + points, 0);
-  while (pointDelta !== 0) {
-    const candidates = gameProfiles
-      .map((profile, index) => ({ ...profile, points: playerPoints[index] }))
-      .filter(({ player, points }) => player.minutes >= 12 && (pointDelta > 0 || points > 0));
-    const selected = pickWeightedProfile(
-      candidates.length > 0 ? candidates : gameProfiles.map((profile, index) => ({ ...profile, points: playerPoints[index] })),
-      rng,
-      pointDelta > 0 ? "usage" : "points",
-    );
-    playerPoints[selected.index] += pointDelta > 0 ? 1 : -1;
-    pointDelta += pointDelta > 0 ? -1 : 1;
+  if (pointDelta !== 0) {
+    const adding = pointDelta > 0;
+    const step = adding ? 1 : -1;
+    const rotation = gameProfiles.filter(({ player }) => player.minutes >= 12);
+
+    while (pointDelta !== 0) {
+      // When taking points away, only players who still have some are eligible,
+      // so that shortlist has to be rebuilt as the lines change.
+      const eligible = adding ? rotation : rotation.filter((profile) => playerPoints[profile.index] > 0);
+      const selected = pickWeightedProfile(eligible.length > 0 ? eligible : gameProfiles, playerPoints, rng, adding);
+      playerPoints[selected.index] += step;
+      pointDelta -= step;
+    }
   }
 
   const initial = gameProfiles.map(({ player }, index) => {
@@ -90,19 +102,24 @@ export function generateBoxScore({
   return initial.sort((a, b) => b.minutes - a.minutes) satisfies PlayerBoxScore[];
 }
 
-function pickWeightedProfile<T extends { player: Team["players"][number]; index: number; points?: number; shotWeight: number }>(
-  profiles: T[],
-  rng: SeededRng,
-  mode: "usage" | "points",
-) {
-  const total = profiles.reduce((acc, profile) => {
-    const weight = mode === "usage" ? profile.shotWeight : Math.max(1, profile.points ?? 0);
-    return acc + weight;
-  }, 0);
+/**
+ * Weighted draw over a shortlist of players: by shot share when handing points
+ * out, by points already scored when taking them back.
+ */
+function pickWeightedProfile(profiles: GameProfile[], playerPoints: number[], rng: SeededRng, byShotWeight: boolean) {
+  const weightOf = byShotWeight
+    ? (profile: GameProfile) => profile.shotWeight
+    : (profile: GameProfile) => Math.max(1, playerPoints[profile.index]);
+
+  let total = 0;
+  for (const profile of profiles) {
+    total += weightOf(profile);
+  }
+
   let cursor = rng.between(0, total);
 
   for (const profile of profiles) {
-    cursor -= mode === "usage" ? profile.shotWeight : Math.max(1, profile.points ?? 0);
+    cursor -= weightOf(profile);
     if (cursor <= 0) {
       return profile;
     }
@@ -119,7 +136,7 @@ function buildShootingLine({
   rng,
 }: {
   points: number;
-  player: Team["players"][number];
+  player: Player;
   opponent: Team;
   rulesThreeMultiplier: number;
   rng: SeededRng;

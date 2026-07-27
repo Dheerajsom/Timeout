@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CustomMatchup } from "@/components/CustomMatchup";
-import { teams } from "@/lib/teams";
+import { teamSummaries } from "@/lib/teamSummary";
 
 export const metadata: Metadata = {
   title: "Custom Matchup | Timeout",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function MatchupPage() {
-  return <CustomMatchup teams={teams} />;
+  return <CustomMatchup teams={teamSummaries} />;
 }

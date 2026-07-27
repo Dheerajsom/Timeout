@@ -1,6 +1,6 @@
 "use client";
 
-import type { Team } from "@/types/simulation";
+import type { TeamSummary } from "@/lib/teamSummary";
 
 export function TeamSelect({
   label,
@@ -9,7 +9,7 @@ export function TeamSelect({
   onChange,
 }: {
   label: string;
-  teams: Team[];
+  teams: TeamSummary[];
   value: string;
   onChange: (value: string) => void;
 }) {
