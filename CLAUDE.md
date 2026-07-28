@@ -3,6 +3,11 @@
 NBA "what-if" matchup simulator. Pick two teams from any era and simulate a single game or a
 best-of-7 series. Built with **Next.js (App Router) + React + TypeScript + Tailwind CSS**.
 
+## Model selection
+
+**NEVER use Haiku 4.5 for anything at all.** For small tasks and delegated work, use Sonnet 5
+with medium or high reasoning effort.
+
 ## Commands
 
 ```bash
