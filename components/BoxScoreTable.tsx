@@ -23,7 +23,7 @@ export function BoxScoreTable({ team, players }: { team: Team; players: PlayerBo
           <thead className="bg-[#21170f] text-orange-100/78">
             <tr>
               {["Player", "MIN", "PTS", "REB", "AST", "STL", "BLK", "TO", "3PM", "FG", "+/-"].map((label) => (
-                <th key={label} className="px-3 py-3 text-right font-bold first:text-left">
+                <th key={label} scope="col" className="px-3 py-3 text-right font-bold first:text-left">
                   {label}
                 </th>
               ))}

@@ -57,7 +57,15 @@ export function generateBoxScore({
       // When taking points away, only players who still have some are eligible,
       // so that shortlist has to be rebuilt as the lines change.
       const eligible = adding ? rotation : rotation.filter((profile) => playerPoints[profile.index] > 0);
-      const selected = pickWeightedProfile(eligible.length > 0 ? eligible : gameProfiles, playerPoints, rng, adding);
+      const fallback = adding ? gameProfiles : gameProfiles.filter((profile) => playerPoints[profile.index] > 0);
+      const candidates = eligible.length > 0 ? eligible : fallback;
+
+      // Nothing left to take points from — bail rather than push a line negative.
+      if (candidates.length === 0) {
+        break;
+      }
+
+      const selected = pickWeightedProfile(candidates, playerPoints, rng, adding);
       playerPoints[selected.index] += step;
       pointDelta -= step;
     }

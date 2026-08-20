@@ -9,7 +9,6 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@prisma/client": "^6.0.0",
     "@vercel/analytics": "^2.0.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.17.0",
@@ -21,12 +20,13 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@prisma/client": "^7.9.1",
     "@types/node": "^25.9.1",
     "@types/react": "^19.2.16",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.5.0",
     "postcss": "^8.5.15",
-    "prisma": "^6.0.0",
+    "prisma": "^7.9.1",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
@@ -34,10 +34,5 @@
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
-  },
-  "overrides": {
-    "next": {
-      "postcss": "8.5.15"
-    }
   }
 }

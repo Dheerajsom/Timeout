@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { cache } from "react";
 import type { SavedSimulation } from "@/types/simulation";
 import { simulateGame } from "./simulation/simulateGame";
 import { simulateSeries } from "./simulation/simulateSeries";
@@ -22,7 +23,13 @@ export async function saveSimulation(simulation: SavedSimulation) {
   };
 }
 
-export async function getSimulation(id: string) {
+/**
+ * Decoding an id re-runs the simulation, and every page that renders a result
+ * asks for it at least twice (once in `generateMetadata`, once in the page
+ * body). `cache` dedupes those calls within a single request so a best-of-7 is
+ * replayed once instead of fourteen games twice over.
+ */
+export const getSimulation = cache(async function getSimulation(id: string) {
   if (!isSimulationIdWithinLimit(id)) {
     return null;
   }
@@ -40,19 +47,25 @@ export async function getSimulation(id: string) {
 
   const simulations = await readSimulations();
   return simulations.find((simulation) => simulation.id === id) ?? null;
-}
+});
 
 function isSimulationIdWithinLimit(id: string) {
   return id.length > 0 && id.length <= MAX_SIMULATION_ID_LENGTH;
 }
 
-async function readSimulations(): Promise<SavedSimulation[]> {
-  try {
-    const raw = await readFile(storePath, "utf8");
-    return JSON.parse(raw) as SavedSimulation[];
-  } catch {
-    return [];
-  }
+/**
+ * The legacy file store is immutable at runtime, so parse it once per process.
+ * Without this, any request for a UUID-shaped id — which anyone can send to
+ * `/result/<uuid>` — re-reads and re-parses the whole file.
+ */
+let legacySimulations: Promise<SavedSimulation[]> | null = null;
+
+function readSimulations(): Promise<SavedSimulation[]> {
+  legacySimulations ??= readFile(storePath, "utf8")
+    .then((raw) => JSON.parse(raw) as SavedSimulation[])
+    .catch(() => []);
+
+  return legacySimulations;
 }
 
 function encodeSimulationId(simulation: SavedSimulation) {
