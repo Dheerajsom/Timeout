@@ -6,6 +6,9 @@ import { SeededRng } from "./rng";
 import { buildQuarterLines, clamp, splitIntoQuarters } from "./utils";
 import { rulesetModifiers, type RulesetModifiers } from "./constants";
 
+const MIN_TEAM_SCORE = 82;
+const MAX_TEAM_SCORE = 145;
+
 export function simulateGame({
   teamA,
   teamB,
@@ -27,9 +30,10 @@ export function simulateGame({
   let scoreB = makeScore({ team: teamB, opponent: teamA, strength: strengthB - strengthA, pace: averagePace, rng, rules });
 
   if (scoreA === scoreB) {
-    // Break the tie. Bias upward when already at the score floor so we never dip below it.
+    // Break the tie without leaving the score bounds: forced up at the floor,
+    // forced down at the ceiling, coin flip anywhere in between.
     const bump = rng.next() > 0.5 ? 1 : -1;
-    scoreB += scoreB <= 82 ? 1 : bump;
+    scoreB += scoreB <= MIN_TEAM_SCORE ? 1 : scoreB >= MAX_TEAM_SCORE ? -1 : bump;
   }
 
   const teamAQuarters = splitIntoQuarters(scoreA, rng);
@@ -82,6 +86,10 @@ function makeScore({
   const randomVariance = rng.normal(0, 7.8);
 
   return Math.round(
-    clamp(106 + pace + offenseModifier + spacingModifier + rimModifier + strength * 0.7 + randomVariance, 82, 145),
+    clamp(
+      106 + pace + offenseModifier + spacingModifier + rimModifier + strength * 0.7 + randomVariance,
+      MIN_TEAM_SCORE,
+      MAX_TEAM_SCORE,
+    ),
   );
 }

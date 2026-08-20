@@ -69,7 +69,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
                 <thead className="text-muted">
                   <tr>
                     {["Player", "MIN", "USG", "SCOR", "3PT", "PLAY", "REB", "DEF"].map((label) => (
-                      <th key={label} className="px-3 py-3 text-right font-medium first:text-left">
+                      <th key={label} scope="col" className="px-3 py-3 text-right font-medium first:text-left">
                         {label}
                       </th>
                     ))}

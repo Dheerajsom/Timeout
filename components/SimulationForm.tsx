@@ -42,23 +42,32 @@ export function SimulationForm({
     }
 
     setIsLoading(true);
-    const response = await fetch("/api/simulate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        teamAId,
-        teamBId,
-        mode,
-        ruleset: "modern",
-        seed: seed.trim() || undefined,
-      }),
-    });
-    const payload = await response.json();
-    setIsLoading(false);
 
-    if (!response.ok) {
-      setError(payload.error ?? "Simulation failed.");
+    let payload: { simulationId?: string; error?: string };
+    try {
+      const response = await fetch("/api/simulate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          teamAId,
+          teamBId,
+          mode,
+          ruleset: "modern",
+          seed: seed.trim() || undefined,
+        }),
+      });
+      payload = await response.json();
+
+      if (!response.ok) {
+        setError(payload.error ?? "Simulation failed.");
+        return;
+      }
+    } catch {
+      // Without this the request rejects unhandled and the spinner never stops.
+      setError("Simulation failed. Check your connection and try again.");
       return;
+    } finally {
+      setIsLoading(false);
     }
 
     router.push(`/result/${payload.simulationId}`);

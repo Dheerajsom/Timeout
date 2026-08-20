@@ -89,8 +89,17 @@ function isRoundHistoryEntry(value: unknown): value is RoundHistoryEntry {
     typeof entry.userScore === "number" &&
     typeof entry.opponentScore === "number" &&
     typeof entry.userWon === "boolean" &&
-    typeof entry.resultUrl === "string"
+    isResultPath(entry.resultUrl)
   );
+}
+
+/**
+ * History comes back out of localStorage and is fed straight into a `Link`
+ * href, so only accept the same-origin result paths we write — never a
+ * scheme-bearing or protocol-relative URL.
+ */
+function isResultPath(value: unknown): value is string {
+  return typeof value === "string" && /^\/result\/[^/\\]+$/.test(value);
 }
 
 export function formatHistoryDate(value: string) {
