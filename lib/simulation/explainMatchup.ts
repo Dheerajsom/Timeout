@@ -1,9 +1,12 @@
 import type { MatchupFactor, Ruleset, Team } from "@/types/simulation";
 import { rulesetModifiers } from "./constants";
 
+/** Numeric fields on `Team` only — an edge compares two of them directly. */
+type NumericStat = { [K in keyof Team]: Team[K] extends number ? K : never }[keyof Team];
+
 type Edge = {
   label: string;
-  stat: keyof Team;
+  stat: NumericStat;
   copy: string;
 };
 
@@ -20,7 +23,7 @@ const edges: Edge[] = [
 export function buildMatchupFactors(teamA: Team, teamB: Team, ruleset: Ruleset): MatchupFactor[] {
   const factors = edges
     .map((edge) => {
-      const value = Number(teamA[edge.stat]) - Number(teamB[edge.stat]);
+      const value = teamA[edge.stat] - teamB[edge.stat];
       const leader = value >= 0 ? teamA : teamB;
       return {
         label: edge.label,

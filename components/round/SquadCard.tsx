@@ -1,10 +1,6 @@
 import { Lock, ShieldCheck } from "lucide-react";
 import { getTeamColors } from "@/lib/teamColors";
-import { getTeamInitials, winPct, type RoundTeam } from "@/lib/round";
-
-export function formatWinPct(team: Pick<RoundTeam, "wins" | "losses">) {
-  return winPct(team).toFixed(3).replace(/^0/, "");
-}
+import { formatWinPct, getTeamInitials, type RoundTeam } from "@/lib/round";
 
 /**
  * Revealed squad card. With `showStats` (With Stats mode) it lays out

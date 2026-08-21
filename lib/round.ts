@@ -59,6 +59,11 @@ export function winPct(team: Pick<Team, "wins" | "losses">) {
   return games > 0 ? team.wins / games : 0.5;
 }
 
+/** Win rate for broadcast display, e.g. ".723". */
+export function formatWinPct(team: Pick<Team, "wins" | "losses">) {
+  return winPct(team).toFixed(3).replace(/^0/, "");
+}
+
 /** Short broadcast-style identity tag derived from the rating profile. */
 export function identityTag(team: Team) {
   const pct = winPct(team);
