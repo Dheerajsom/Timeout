@@ -2,8 +2,7 @@
 
 import { Loader2, Play, RotateCcw, Undo2 } from "lucide-react";
 import { getTeamColors } from "@/lib/teamColors";
-import { getTeamInitials, type RoundTeam } from "@/lib/round";
-import { formatWinPct } from "@/components/round/SquadCard";
+import { formatWinPct, getTeamInitials, type RoundTeam } from "@/lib/round";
 
 const comparedStats = [
   { key: "offense", label: "Offense" },
@@ -201,7 +200,8 @@ function CompareRow({
   colorB: string;
   delay: number;
 }) {
-  const aLeads = a >= b;
+  const aLeads = a > b;
+  const bLeads = b > a;
 
   return (
     <div className="grid grid-cols-[2.5rem_1fr_5.5rem_1fr_2.5rem] items-center gap-2 sm:grid-cols-[3rem_1fr_6.5rem_1fr_3rem]">
@@ -220,10 +220,10 @@ function CompareRow({
       <span className="flex h-2 overflow-hidden rounded-full bg-white/6">
         <span
           className="bar-grow-right h-full rounded-full"
-          style={{ width: `${barWidth(b)}%`, background: colorB, opacity: aLeads ? 0.45 : 1, animationDelay: `${delay}ms` }}
+          style={{ width: `${barWidth(b)}%`, background: colorB, opacity: bLeads ? 1 : 0.45, animationDelay: `${delay}ms` }}
         />
       </span>
-      <span className={`font-display text-base font-bold tabular-nums ${aLeads ? "text-white/45" : "text-white"}`}>
+      <span className={`font-display text-base font-bold tabular-nums ${bLeads ? "text-white" : "text-white/45"}`}>
         {b}
       </span>
     </div>

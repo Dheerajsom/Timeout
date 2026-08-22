@@ -9,20 +9,25 @@ import {
 } from "recharts";
 import type { Team } from "@/types/simulation";
 
+const radarMetrics = [
+  "offense",
+  "defense",
+  "spacing",
+  "rimPressure",
+  "rebounding",
+  "playmaking",
+  "starPower",
+  "physicality",
+] as const satisfies readonly (keyof Team)[];
+
 export function TeamRadarChart({ teamA, teamB }: { teamA: Team; teamB: Team }) {
-  const data = [
-    "offense",
-    "defense",
-    "spacing",
-    "rimPressure",
-    "rebounding",
-    "playmaking",
-    "starPower",
-    "physicality",
-  ].map((key) => ({
+  // Two squads can share one franchise name (e.g. the 1991 and 1996 Bulls), so
+  // the series keys must be stable — keying off the franchise would collapse
+  // both teams into a single series on those matchups.
+  const data = radarMetrics.map((key) => ({
     metric: labelize(key),
-    [teamA.franchise]: Number(teamA[key as keyof Team]),
-    [teamB.franchise]: Number(teamB[key as keyof Team]),
+    teamA: Number(teamA[key]),
+    teamB: Number(teamB[key]),
   }));
 
   return (
@@ -35,8 +40,8 @@ export function TeamRadarChart({ teamA, teamB }: { teamA: Team; teamB: Team }) {
             contentStyle={{ background: "#101318", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 6 }}
             labelStyle={{ color: "#f6f7fb" }}
           />
-          <Radar name={teamA.franchise} dataKey={teamA.franchise} stroke="#26d0b8" fill="#26d0b8" fillOpacity={0.18} />
-          <Radar name={teamB.franchise} dataKey={teamB.franchise} stroke="#ff4f5a" fill="#ff4f5a" fillOpacity={0.12} />
+          <Radar name={teamA.franchise} dataKey="teamA" stroke="#26d0b8" fill="#26d0b8" fillOpacity={0.18} />
+          <Radar name={teamB.franchise} dataKey="teamB" stroke="#ff4f5a" fill="#ff4f5a" fillOpacity={0.12} />
         </RadarChart>
       </div>
     </div>
